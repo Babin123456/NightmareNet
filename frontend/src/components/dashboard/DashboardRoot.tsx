@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { AppShell } from "./AppShell";
 import type { DashboardSectionKey } from "./Sidebar";
@@ -16,6 +16,11 @@ import { AuditTrail } from "./AuditTrail";
 import { BenchmarkSuite } from "./BenchmarkSuite";
 import { CIIntegration } from "./CIIntegration";
 import { SettingsPanel } from "./SettingsPanel";
+import { OnboardingOverlay } from "./OnboardingOverlay";
+import { KeyboardHelp } from "./KeyboardHelp";
+import { AskNightmareDock } from "./AskNightmareDock";
+import { ToastProvider, useToast } from "../ui/Toast";
+import { useGlobalShortcuts } from "./useGlobalShortcuts";
 
 type SectionMeta = {
   title: string;
@@ -47,22 +52,58 @@ const fadeIn = {
   animate: { opacity: 1, y: 0, transition: { duration: 0.25, ease: "easeOut" as const } },
 };
 
-export function DashboardRoot() {
+function DashboardRootInner() {
   const [section, setSection] = useState<DashboardSectionKey>("command-center");
+  const [helpOpen, setHelpOpen] = useState(false);
+  const [palettePulse, setPalettePulse] = useState(0); // bumped to ask AppShell to open palette
   const meta = useMemo(() => SECTION_META[section], [section]);
+  const toast = useToast();
+
+  const navigate = useCallback((next: DashboardSectionKey) => {
+    setSection((prev) => {
+      if (prev === next) return prev;
+      return next;
+    });
+  }, []);
+
+  useGlobalShortcuts({
+    onPaletteToggle: () => setPalettePulse((n) => n + 1),
+    onHelpToggle: () => setHelpOpen((o) => !o),
+    onNavigate: (next) => {
+      navigate(next);
+      toast.push({
+        title: `Jumped to ${SECTION_META[next].title}`,
+        variant: "info",
+        durationMs: 1800,
+      });
+    },
+  });
 
   return (
     <AppShell
       activeSection={section}
-      onSectionChange={setSection}
+      onSectionChange={navigate}
       title={meta.title}
       breadcrumb={meta.breadcrumb}
       apiStatus="online"
+      externalPaletteOpenPulse={palettePulse}
       onPaletteAction={(a) => {
-        if (a === "new-run") setSection("experiments");
-        if (a === "bench-mr") setSection("benchmarks");
-        if (a === "export") setSection("run-detail");
-        if (a === "cancel-run") setSection("run-detail");
+        if (a === "new-run") {
+          navigate("experiments");
+          toast.push({ title: "Opening experiments", description: "Start a new run here.", variant: "info" });
+        }
+        if (a === "bench-mr") {
+          navigate("benchmarks");
+          toast.push({ title: "Benchmark suite", description: "Pick a benchmark to run.", variant: "info" });
+        }
+        if (a === "export") {
+          navigate("run-detail");
+          toast.push({ title: "Export ready", description: "Latest run report opened.", variant: "success" });
+        }
+        if (a === "cancel-run") {
+          navigate("run-detail");
+          toast.push({ title: "Cancellation queued", description: "The active run will stop after the current step.", variant: "warning" });
+        }
       }}
     >
       <AnimatePresence mode="wait">
@@ -188,6 +229,18 @@ export function DashboardRoot() {
           )}
         </motion.div>
       </AnimatePresence>
+
+      <OnboardingOverlay onNavigate={navigate} />
+      <KeyboardHelp open={helpOpen} onClose={() => setHelpOpen(false)} />
+      <AskNightmareDock section={section} onNavigate={navigate} />
     </AppShell>
+  );
+}
+
+export function DashboardRoot() {
+  return (
+    <ToastProvider>
+      <DashboardRootInner />
+    </ToastProvider>
   );
 }
