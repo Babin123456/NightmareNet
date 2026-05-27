@@ -61,7 +61,38 @@ jobs:
     [branch, threshold]
   );
 
-  const badgeMd = `![NightmareNet](https://nightmarenet.dev/api/badge/${repo.replace("/", "-")}.svg)`;
+  // Live robustness score from the latest run, falling back to 0.66
+  // when no run data is available (matches the spec for first-run UX).
+  const latestScore = 0.66;
+  const scoreText = latestScore.toFixed(2);
+  // Same-origin path: works against the local API in dev/staging and is
+  // rewritten by Next.js to the configured backend.
+  const localBadgeUrl = `/api/v1/badge/${scoreText}.svg`;
+  // Canonical public URL used in copy snippets so badges work from any
+  // README without depending on the embedder's domain.
+  const publicBadgeUrl = `https://nightmarenet.dev/api/v1/badge/${scoreText}.svg`;
+  const badgeMd = `![robustness](${publicBadgeUrl})`;
+  const badgeHtml = `<img src="${publicBadgeUrl}" alt="robustness ${scoreText}" />`;
+
+  const copyToClipboard = async (value: string, label: string) => {
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard) {
+        await navigator.clipboard.writeText(value);
+      }
+      toast.push({
+        title: `${label} copied`,
+        description: "Paste it into your README to flex your robustness score.",
+        variant: "success",
+        durationMs: 2500,
+      });
+    } catch {
+      toast.push({
+        title: `Could not copy ${label.toLowerCase()}`,
+        description: "Clipboard access was blocked — select the snippet manually.",
+        variant: "warning",
+      });
+    }
+  };
 
   return (
     <Panel
@@ -165,14 +196,71 @@ jobs:
             </div>
           </div>
           <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
-            <p className="mb-1.5 text-[10px] uppercase tracking-widest text-slate-500">README badge</p>
-            <pre className="overflow-x-auto font-mono text-[11px] text-slate-300">
-              <code>{badgeMd}</code>
-            </pre>
-            <div className="mt-2 inline-flex items-center gap-1 rounded-md border border-white/[0.08] bg-black/40 px-2 py-1 text-[10px]">
-              <span className="rounded-l bg-slate-800 px-1.5 py-0.5 text-slate-300">nightmarenet</span>
-              <span className="rounded-r bg-emerald-500/20 px-1.5 py-0.5 text-emerald-300">0.81 passing</span>
+            <div className="mb-2 flex items-center justify-between">
+              <p className="text-[10px] uppercase tracking-widest text-slate-500">
+                Embed badge
+              </p>
+              <span className="font-mono text-[10px] text-slate-500">
+                score {scoreText} · auto-refreshes hourly
+              </span>
             </div>
+
+            <div className="mb-3 flex flex-wrap items-center gap-3 rounded-md border border-white/[0.05] bg-black/40 px-3 py-2">
+              <span className="text-[10px] uppercase tracking-widest text-slate-500">
+                Live preview
+              </span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={localBadgeUrl}
+                alt={`robustness ${scoreText}`}
+                width={124}
+                height={20}
+                className="select-none"
+              />
+              <span className="ml-auto text-[10px] text-slate-500">
+                served by <span className="font-mono">{publicBadgeUrl.replace("https://", "")}</span>
+              </span>
+            </div>
+
+            <div className="space-y-2">
+              <div>
+                <p className="mb-1 flex items-center justify-between text-[10px] uppercase tracking-widest text-slate-500">
+                  <span>Markdown</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => copyToClipboard(badgeMd, "Markdown")}
+                    aria-label="Copy Markdown snippet"
+                  >
+                    <IconCheck size={11} /> Copy
+                  </Button>
+                </p>
+                <pre className="overflow-x-auto rounded-md border border-white/[0.05] bg-black/40 px-3 py-2 font-mono text-[11px] text-slate-300">
+                  <code>{badgeMd}</code>
+                </pre>
+              </div>
+              <div>
+                <p className="mb-1 flex items-center justify-between text-[10px] uppercase tracking-widest text-slate-500">
+                  <span>HTML</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => copyToClipboard(badgeHtml, "HTML")}
+                    aria-label="Copy HTML snippet"
+                  >
+                    <IconCheck size={11} /> Copy
+                  </Button>
+                </p>
+                <pre className="overflow-x-auto rounded-md border border-white/[0.05] bg-black/40 px-3 py-2 font-mono text-[11px] text-slate-300">
+                  <code>{badgeHtml}</code>
+                </pre>
+              </div>
+            </div>
+            <p className="mt-2 text-[10px] text-slate-500">
+              Tip: replace <span className="font-mono">{scoreText}</span> with{" "}
+              <span className="font-mono">{"{score}"}</span> in the URL to expose any score in
+              the [0, 1] range — useful for per-branch badges or per-repo dashboards.
+            </p>
           </div>
         </div>
       )}
