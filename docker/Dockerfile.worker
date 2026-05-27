@@ -56,6 +56,7 @@ COPY nightmarenet_server/ nightmarenet_server/
 COPY scripts/ scripts/
 COPY configs/ configs/
 COPY docker/worker-entrypoint.sh /usr/local/bin/worker-entrypoint.sh
+COPY docker/healthcheck_worker.py /usr/local/bin/healthcheck_worker.py
 
 RUN chmod +x /usr/local/bin/worker-entrypoint.sh \
     && mkdir -p /app/checkpoints /app/logs /app/data \
@@ -63,7 +64,11 @@ RUN chmod +x /usr/local/bin/worker-entrypoint.sh \
 
 USER nightmare
 
+# Real liveness probe — TCP-connects to the broker and, when Celery is
+# installed, asks the worker to respond to a ping. The previous one-liner
+# (`os.environ.get(NIGHTMARENET_REDIS_URL)`) was a tautology because the
+# same variable is set unconditionally as an ENV directive above.
 HEALTHCHECK --interval=60s --timeout=10s --start-period=30s --retries=3 \
-    CMD python -c "import os, sys; sys.exit(0 if os.environ.get('NIGHTMARENET_REDIS_URL') else 1)"
+    CMD python /usr/local/bin/healthcheck_worker.py || exit 1
 
 ENTRYPOINT ["worker-entrypoint.sh"]
