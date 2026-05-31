@@ -151,13 +151,13 @@ export function AuditTrail() {
               <Badge variant={VARIANTS[e.kind]} size="xs">
                 {e.kind}
               </Badge>
-              <span className="font-mono text-[10px] text-slate-500">{e.id}</span>
+              <span className="font-mono text-[10px] text-slate-400">{e.id}</span>
               <span className="text-[10px] text-slate-600">·</span>
               <span className="text-[10px] text-slate-400">{e.ts}</span>
-              <span className="ml-auto font-mono text-[10px] text-slate-500">{e.actor}</span>
+              <span className="ml-auto font-mono text-[10px] text-slate-400">{e.actor}</span>
             </div>
             <p className="mt-1 text-[12px] text-slate-200">{e.message}</p>
-            {e.meta && <p className="mt-0.5 font-mono text-[10px] text-slate-500">{e.meta}</p>}
+            {e.meta && <p className="mt-0.5 font-mono text-[10px] text-slate-400">{e.meta}</p>}
           </motion.li>
         ))}
       </ol>

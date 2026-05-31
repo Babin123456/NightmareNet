@@ -6,6 +6,7 @@ import { Panel } from "./Panel";
 import { Badge } from "@/components/ui/Badge";
 import { Select } from "@/components/ui/Select";
 import { Progress } from "@/components/ui/Progress";
+import { useDemoMode } from "@/lib/hooks";
 import { IconTrend } from "./icons";
 
 interface ModelStat {
@@ -71,7 +72,7 @@ function MetricRow({ label, a, b, unit = "", higherIsBetter = true, format }: Me
   const winsA = higherIsBetter ? a >= b : a <= b;
   return (
     <div className="grid grid-cols-[110px_1fr_60px_1fr_60px] items-center gap-2 py-1.5 text-[11px]">
-      <span className="text-slate-500">{label}</span>
+      <span className="text-slate-400">{label}</span>
       <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-white/[0.04]">
         <motion.div
           initial={{ width: 0 }}
@@ -102,6 +103,7 @@ function MetricRow({ label, a, b, unit = "", higherIsBetter = true, format }: Me
 export function ModelComparison() {
   const [a, setA] = useState("base");
   const [b, setB] = useState("hardened");
+  const { isLive } = useDemoMode();
   const ma = MODELS[a];
   const mb = MODELS[b];
 
@@ -111,7 +113,12 @@ export function ModelComparison() {
       subtitle="A/B side-by-side"
       icon={<IconTrend size={14} />}
       glow="neural"
-      toolbar={<Badge variant="neural" size="xs">5 metrics</Badge>}
+      toolbar={
+        <div className="flex items-center gap-2">
+          {!isLive && <Badge variant="warning" size="xs">demo data</Badge>}
+          <Badge variant="neural" size="xs">5 metrics</Badge>
+        </div>
+      }
     >
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Select
@@ -134,12 +141,12 @@ export function ModelComparison() {
         <div className="rounded-lg border border-emerald-500/15 bg-emerald-500/[0.04] p-2.5">
           <p className="text-[10px] uppercase tracking-widest text-emerald-300">Model A</p>
           <p className="truncate text-sm text-slate-100">{ma.name}</p>
-          <p className="text-[10px] text-slate-500">{ma.size} · {ma.flops} · trained on {ma.trainedOn}</p>
+          <p className="text-[10px] text-slate-400">{ma.size} · {ma.flops} · trained on {ma.trainedOn}</p>
         </div>
         <div className="rounded-lg border border-slate-500/15 bg-white/[0.02] p-2.5">
           <p className="text-[10px] uppercase tracking-widest text-slate-400">Model B</p>
           <p className="truncate text-sm text-slate-100">{mb.name}</p>
-          <p className="text-[10px] text-slate-500">{mb.size} · {mb.flops} · trained on {mb.trainedOn}</p>
+          <p className="text-[10px] text-slate-400">{mb.size} · {mb.flops} · trained on {mb.trainedOn}</p>
         </div>
       </div>
 
@@ -151,7 +158,7 @@ export function ModelComparison() {
       </div>
 
       <div className="mt-3">
-        <p className="mb-1 text-[10px] uppercase tracking-widest text-slate-500">Composite score</p>
+        <p className="mb-1 text-[10px] uppercase tracking-widest text-slate-400">Composite score</p>
         <div className="grid grid-cols-2 gap-2">
           <Progress value={(ma.robustness + ma.accuracy) / 2} tone="success" size="sm" showValue label={ma.name.split(" · ")[1] ?? "A"} />
           <Progress value={(mb.robustness + mb.accuracy) / 2} tone="neural" size="sm" showValue label={mb.name.split(" · ")[1] ?? "B"} />

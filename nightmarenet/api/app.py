@@ -111,6 +111,15 @@ from nightmarenet.api.copilot import register_copilot_routes  # noqa: E402
 
 register_copilot_routes(app, limiter)
 
+# --- Config suggestion router (LLM + heuristic fallback) ---
+from nightmarenet.api.suggest import register_suggest_routes  # noqa: E402
+
+register_suggest_routes(app, limiter)
+
+from nightmarenet.api.data_optimize import register_data_optimize_routes  # noqa: E402
+
+register_data_optimize_routes(app, limiter)
+
 
 def _apply_dream_distortions(
     text: str,

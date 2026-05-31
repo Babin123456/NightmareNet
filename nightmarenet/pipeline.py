@@ -188,6 +188,61 @@ class Pipeline:
             raise
 
     # ------------------------------------------------------------------
+    # Stage 1.5: Optimize (optional — Adaption Labs)
+    # ------------------------------------------------------------------
+
+    def optimize(self) -> None:
+        """Optionally optimize the ingested dataset via Adaption Labs.
+
+        Reads configuration from ``self.config["adaption"]``. If disabled
+        or the SDK is unavailable, this is a silent no-op.
+        """
+        adaption_cfg = self.config.get("adaption", {})
+        if not adaption_cfg.get("enabled", False):
+            return
+
+        import os
+
+        try:
+            from nightmarenet.data.adaption import Adaption, AdaptionOptimizer
+        except ImportError:
+            logger.info("adaption SDK not installed; skipping optimization.")
+            return
+
+        if Adaption is None:
+            logger.info("adaption SDK not available; skipping optimization.")
+            return
+
+        if not os.environ.get("ADAPTION_API_KEY"):
+            logger.info("ADAPTION_API_KEY not set; skipping optimization.")
+            return
+
+        column_mapping = adaption_cfg.get("column_mapping", {})
+        max_rows = adaption_cfg.get("max_rows", 5000)
+
+        self.metrics.progress_pct = 8.0
+        self.metrics.current_phase = "optimize"
+        self._emit()
+
+        try:
+            optimizer = AdaptionOptimizer()
+            result = optimizer.optimize_dataset(
+                self._dataset, column_mapping, max_rows=max_rows
+            )
+            if result is not None:
+                optimized_dataset, quality = result
+                self._dataset = optimized_dataset
+                self.metrics.progress_pct = 15.0
+                self._emit()
+                logger.info("Dataset optimization complete: %s", quality)
+            else:
+                logger.warning("Adaption optimization returned None; keeping original dataset.")
+                self._emit()
+        except Exception:
+            logger.warning("Adaption optimization failed; keeping original dataset.", exc_info=True)
+            self._emit()
+
+    # ------------------------------------------------------------------
     # Stage 2: Prepare
     # ------------------------------------------------------------------
 
@@ -429,6 +484,7 @@ class Pipeline:
             hf_dataset=hf_dataset,
             hf_subset=hf_subset,
         )
+        self.optimize()
         self.prepare()
         self.train()
         comparison = self.evaluate()

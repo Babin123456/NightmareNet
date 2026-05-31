@@ -41,7 +41,7 @@ export function KeyboardHelp({ open, onClose }: KeyboardHelpProps) {
               <button
                 type="button"
                 onClick={onClose}
-                className="cursor-pointer rounded-md px-2 py-1 text-[11px] text-slate-500 hover:bg-white/5 hover:text-slate-300"
+                className="cursor-pointer rounded-md px-2 py-1 text-[11px] text-slate-400 hover:bg-white/5 hover:text-slate-300"
               >
                 Esc
               </button>
@@ -75,7 +75,7 @@ export function KeyboardHelp({ open, onClose }: KeyboardHelpProps) {
                 </div>
               ))}
             </div>
-            <div className="border-t border-white/[0.06] px-5 py-3 text-[11px] text-slate-500">
+            <div className="border-t border-white/[0.06] px-5 py-3 text-[11px] text-slate-400">
               Tip: Shortcuts are disabled while typing into text fields, so they never fight your editing.
             </div>
           </motion.div>

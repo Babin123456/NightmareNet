@@ -104,8 +104,8 @@ export function BenchmarkSuite() {
                     <Badge variant="outline" size="xs">{CATEGORY_LABEL[b.category]}</Badge>
                     {b.default && <Badge variant="neural" size="xs">default</Badge>}
                   </div>
-                  <p className="mt-0.5 text-[11px] text-slate-500">{b.description}</p>
-                  <div className="mt-2 flex flex-wrap items-center gap-3 text-[11px] text-slate-500">
+                  <p className="mt-0.5 text-[11px] text-slate-400">{b.description}</p>
+                  <div className="mt-2 flex flex-wrap items-center gap-3 text-[11px] text-slate-400">
                     <span>~ {b.duration}</span>
                     {b.lastScore !== null && (
                       <span>

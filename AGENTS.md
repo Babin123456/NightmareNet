@@ -67,16 +67,20 @@ Configured in `.claude/settings.json`:
 
 - Research-first execution: deep competitive landscape, market sizing, academic lit, GTM, personas, and architecture patterns before implementing; leverage Browser Use API for live web research/automation where applicable.
 - Use subagents aggressively for parallel research, exploration, debugging, security review, and verification; one focused responsibility per subagent.
+- **Subagents tend to fail sometimes** — always retry on error, investigate root cause before re-dispatch. Common failures: `[invalid_argument]`, `PING timed out`, interactive CLI prompts blocking. Mitigations: pass `--yes`/`-y` flags, pipe `echo Y |`, use non-interactive mode, keep prompts focused and under token limits.
 - Linear/Vercel/Stripe-tier UI polish; feature-dense, information-heavy panels inspired by Linear/Vercel/DarkLead, Arc, Notion, Raycast — not minimal or sparse.
+- Subtle UI sounds (Linear/Notion style clicks, success chimes, transition whooshes) — NOT immersive ambient/cyberpunk audio.
+- Pipeline visualization preference: interactive node graph with 3D orbital elements (hybrid draggable nodes + orbital phase rotation around central model).
 - Plan-mode-first for any non-trivial task (3+ steps or architectural decisions); generate full PRD/TRD/architecture/UX flows/API contracts/sprint plans as part of planning, not just task lists; re-plan if anything goes sideways.
 - Track work via `tasks/todo.md` (checkable items) and corrections via `tasks/lessons.md` (self-improvement loop, append after every user correction).
 - Verification before completion + autonomous bug fixing: tests, lint, type-check, UX validation, architecture integrity; investigate, trace root cause, fix, and validate without hand-holding; never claim done without staff-engineer-level proof and zero tolerance for shortcuts, lazy implementations, or fake completion.
 - Demand elegance: pause and ask "Is there a more elegant solution?" before non-trivial implementations; reject hacky, repetitive, brittle, or tightly-coupled code.
 - Git discipline: Conventional Commits, atomic per logical change; commit and push frequently to grow GitHub contribution history (clean atomic history naturally drives up commit count) — the user explicitly asks for this cadence.
-- AI-native thinking: every feature considers AI copilots, semantic search, intelligent automation, conversational workflows; integrate Azure OpenAI, OpenAI APIs, Anthropic Claude, RAG pipelines, and vector databases as needed.
+- AI-native thinking: every feature considers AI copilots, semantic search, intelligent automation, conversational workflows; integrate Azure OpenAI (sole LLM backend — Bedrock removed), RAG pipelines, and vector databases as needed.
 - Performance-first: sub-100ms UI, sub-500ms API, CUDA acceleration, mixed precision, quantization for ML; code splitting and lazy loading on the frontend.
 - Security + DevOps: RBAC, secrets in vaults, rate limiting, audit logs, least-privilege, compliance readiness; CI/CD via GitHub Actions, Docker, Vercel/Railway, PostgreSQL/Redis, observability, rollback strategies, cost optimization.
 - Spec-driven + repository intelligence: GitHub Spec Kit structured specs/ADRs/validation pipelines; use GitNexus for impact analysis before editing any symbol, and complement with `graphify` and `code-review-graph` for architecture and PR-review intelligence.
+- Design skills installed: `npx impeccable skills install` (pbakaus/impeccable), `npx skills add Leonxlnx/taste-skill --skill "design-taste-frontend"`, `npx skills add emilkowalski/skill`. Skills install to `.cursor/skills/` via the `npx skills` CLI.
 
 ## Learned Workspace Facts
 

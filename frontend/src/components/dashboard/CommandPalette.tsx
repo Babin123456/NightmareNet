@@ -178,13 +178,13 @@ export function CommandPalette({
                 className="flex-1 bg-transparent text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none"
                 aria-label="Command palette search"
               />
-              <kbd className="rounded bg-white/[0.06] px-1.5 py-0.5 font-mono text-[10px] text-slate-500">
+              <kbd className="rounded bg-white/[0.06] px-1.5 py-0.5 font-mono text-[10px] text-slate-400">
                 ESC
               </kbd>
             </div>
             <div className="max-h-[420px] overflow-y-auto py-2">
               {filtered.length === 0 ? (
-                <p className="px-4 py-8 text-center text-xs text-slate-500">
+                <p className="px-4 py-8 text-center text-xs text-slate-400">
                   No commands match <span className="font-mono text-slate-300">&quot;{query}&quot;</span>
                 </p>
               ) : (
@@ -219,7 +219,7 @@ export function CommandPalette({
                           </span>
                           <span className="flex-1 truncate text-[13px]">{it.label}</span>
                           {it.hint && (
-                            <span className="text-[10px] uppercase tracking-wider text-slate-500">
+                            <span className="text-[10px] uppercase tracking-wider text-slate-400">
                               {it.hint}
                             </span>
                           )}
@@ -231,7 +231,7 @@ export function CommandPalette({
                 ))
               )}
             </div>
-            <div className="flex items-center justify-between border-t border-white/[0.06] px-3 py-2 text-[10px] text-slate-500">
+            <div className="flex items-center justify-between border-t border-white/[0.06] px-3 py-2 text-[10px] text-slate-400">
               <span className="flex items-center gap-3">
                 <kbd className="rounded bg-white/[0.06] px-1 py-0.5 font-mono">↑↓</kbd> navigate
                 <kbd className="rounded bg-white/[0.06] px-1 py-0.5 font-mono">↵</kbd> run

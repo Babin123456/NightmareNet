@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Panel } from "./Panel";
 import { Badge } from "@/components/ui/Badge";
 import { IconLayers } from "./icons";
+import { PipelineGraph } from "./PipelineGraph";
 
 const PHASES = [
   { key: "wake", label: "Wake", color: "var(--color-neural)", description: "Anchor representations on clean data" },
@@ -39,6 +40,10 @@ export function PhaseVisualizer({ activePhase = 1 }: { activePhase?: number }) {
         </Badge>
       }
     >
+      <div className="mb-4">
+        <PipelineGraph />
+      </div>
+
       <div className="flex flex-col items-center gap-4 py-2 lg:flex-row lg:items-center lg:gap-6">
         <div className="relative" style={{ width: 260, height: 260 }}>
           <svg width="260" height="260" viewBox="0 0 260 260">

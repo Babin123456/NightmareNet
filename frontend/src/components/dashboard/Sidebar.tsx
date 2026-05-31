@@ -5,6 +5,7 @@ import {
   IconActivity,
   IconBeaker,
   IconBenchmark,
+  IconDatabase,
   IconGit,
   IconHistory,
   IconHome,
@@ -27,6 +28,7 @@ export type DashboardSectionKey =
   | "robustness"
   | "compare"
   | "distortions"
+  | "data-quality"
   | "audit"
   | "benchmarks"
   | "ci"
@@ -54,6 +56,7 @@ const NAV: NavGroup[] = [
       { key: "robustness", label: "Robustness Radar", icon: <IconRadar size={15} /> },
       { key: "compare", label: "Model Compare", icon: <IconTrend size={15} /> },
       { key: "distortions", label: "Distortions", icon: <IconWand size={15} /> },
+      { key: "data-quality", label: "Data Quality", icon: <IconDatabase size={15} /> },
     ],
   },
   {
@@ -99,7 +102,7 @@ export function Sidebar({
         {!collapsed && (
           <div className="min-w-0">
             <p className="text-sm font-semibold tracking-tight text-slate-100">NightmareNet</p>
-            <p className="text-[10px] uppercase tracking-widest text-slate-500">Sprint · 03</p>
+            <p className="text-[10px] uppercase tracking-widest text-slate-400">Sprint · 03</p>
           </div>
         )}
       </div>
@@ -166,7 +169,7 @@ export function Sidebar({
               </span>
             </div>
             <p className="font-mono text-lg text-slate-100">82.4</p>
-            <p className="text-[10px] text-slate-500">+4.1 vs last cycle</p>
+            <p className="text-[10px] text-slate-400">+4.1 vs last cycle</p>
           </div>
         ) : (
           <div className="flex h-9 items-center justify-center rounded-md bg-dream/[0.06] text-dream-soft">

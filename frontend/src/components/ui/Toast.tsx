@@ -10,6 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useSounds } from "@/lib/sounds";
 
 export type ToastVariant = "info" | "success" | "warning" | "error";
 
@@ -67,6 +68,7 @@ const variantIcons: Record<ToastVariant, ReactNode> = {
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const timers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+  const { playSuccess, playError, playNotification } = useSounds();
 
   const dismiss = useCallback((id: string) => {
     const t = timers.current.get(id);
@@ -88,9 +90,14 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       setToasts((prev) => [...prev, item]);
       const handle = setTimeout(() => dismiss(id), item.durationMs);
       timers.current.set(id, handle);
+
+      if (variant === "success") playSuccess();
+      else if (variant === "error") playError();
+      else playNotification();
+
       return id;
     },
-    [dismiss]
+    [dismiss, playSuccess, playError, playNotification]
   );
 
   useEffect(() => {

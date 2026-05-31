@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Panel } from "./Panel";
 import { Badge } from "@/components/ui/Badge";
 import { SkeletonChart } from "@/components/ui/Skeleton";
+import { useDemoMode } from "@/lib/hooks";
 import { IconActivity, IconTrend } from "./icons";
 
 const LOSS_SERIES = [
@@ -156,6 +157,7 @@ export interface LiveMetricsProps {
 
 export function LiveMetrics({ loading = false }: LiveMetricsProps = {}) {
   const [tab, setTab] = useState<"loss" | "robustness">("loss");
+  const { isLive } = useDemoMode();
   return (
     <Panel
       title="Live Metrics"
@@ -163,22 +165,25 @@ export function LiveMetrics({ loading = false }: LiveMetricsProps = {}) {
       icon={<IconActivity size={14} />}
       glow="neural"
       toolbar={
-        <div className="flex items-center gap-1 rounded-md border border-white/[0.06] p-0.5">
-          {([["loss", "Loss"], ["robustness", "Robustness"]] as const).map(([k, l]) => (
-            <button
-              key={k}
-              type="button"
-              onClick={() => setTab(k)}
-              disabled={loading}
-              className={[
-                "rounded px-2 py-1 text-[11px] cursor-pointer transition-colors",
-                tab === k ? "bg-white/[0.06] text-slate-100" : "text-slate-500 hover:text-slate-300",
-                loading ? "pointer-events-none opacity-50" : "",
-              ].join(" ")}
-            >
-              {l}
-            </button>
-          ))}
+        <div className="flex items-center gap-2">
+          {!isLive && <Badge variant="warning" size="xs">demo data</Badge>}
+          <div className="flex items-center gap-1 rounded-md border border-white/[0.06] p-0.5">
+            {([["loss", "Loss"], ["robustness", "Robustness"]] as const).map(([k, l]) => (
+              <button
+                key={k}
+                type="button"
+                onClick={() => setTab(k)}
+                disabled={loading}
+                className={[
+                  "rounded px-2 py-1 text-[11px] cursor-pointer transition-colors",
+                  tab === k ? "bg-white/[0.06] text-slate-100" : "text-slate-400 hover:text-slate-300",
+                  loading ? "pointer-events-none opacity-50" : "",
+                ].join(" ")}
+              >
+                {l}
+              </button>
+            ))}
+          </div>
         </div>
       }
     >
@@ -224,14 +229,11 @@ export function LiveMetrics({ loading = false }: LiveMetricsProps = {}) {
               { label: "Wall time", value: "12m 04s" },
             ].map((m) => (
               <div key={m.label} className="rounded-md border border-white/[0.06] bg-white/[0.02] p-2 text-center">
-                <p className="text-[10px] uppercase tracking-widest text-slate-500">{m.label}</p>
+                <p className="text-[10px] uppercase tracking-widest text-slate-400">{m.label}</p>
                 <p className="mt-0.5 font-mono text-xs text-slate-100">{m.value}</p>
               </div>
             ))}
           </div>
-          <Badge variant="outline" size="xs" className="mt-3">
-            SVG · live updates pending pipeline status hook
-          </Badge>
         </>
       )}
     </Panel>

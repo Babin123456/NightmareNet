@@ -29,6 +29,9 @@ def _clear_llm_keys(monkeypatch):
         "ANTHROPIC_API_KEY",
         "AZURE_OPENAI_API_KEY",
         "AZURE_OPENAI_ENDPOINT",
+        "AWS_BEARER_TOKEN_BEDROCK",
+        "AWS_ACCESS_KEY_ID",
+        "AWS_SECRET_ACCESS_KEY",
     ):
         monkeypatch.delenv(var, raising=False)
 

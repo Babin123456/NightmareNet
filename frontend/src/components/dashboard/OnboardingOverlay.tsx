@@ -112,7 +112,7 @@ export function OnboardingOverlay({ onNavigate }: OnboardingOverlayProps) {
                 <button
                   type="button"
                   onClick={dismiss}
-                  className="cursor-pointer rounded-md px-2 py-1 text-[11px] text-slate-500 hover:bg-white/5 hover:text-slate-300"
+                  className="cursor-pointer rounded-md px-2 py-1 text-[11px] text-slate-400 hover:bg-white/5 hover:text-slate-300"
                 >
                   Skip tour
                 </button>

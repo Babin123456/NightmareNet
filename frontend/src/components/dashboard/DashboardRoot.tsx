@@ -16,12 +16,14 @@ import { AuditTrail } from "./AuditTrail";
 import { BenchmarkSuite } from "./BenchmarkSuite";
 import { CIIntegration } from "./CIIntegration";
 import { SettingsPanel } from "./SettingsPanel";
+import { DataQuality } from "./DataQuality";
 import { OnboardingOverlay } from "./OnboardingOverlay";
 import { WhatsNew } from "./WhatsNew";
 import { KeyboardHelp } from "./KeyboardHelp";
 import { AskNightmareDock } from "./AskNightmareDock";
 import { ToastProvider, useToast } from "../ui/Toast";
 import { useGlobalShortcuts } from "./useGlobalShortcuts";
+import { useSounds } from "@/lib/sounds";
 
 type SectionMeta = {
   title: string;
@@ -37,6 +39,7 @@ const SECTION_META: Record<DashboardSectionKey, SectionMeta> = {
   robustness: { title: "Robustness Radar", breadcrumb: [{ label: "Analytics" }, { label: "Radar" }] },
   compare: { title: "Model Comparison", breadcrumb: [{ label: "Analytics" }, { label: "Compare" }] },
   distortions: { title: "Distortion Preview", breadcrumb: [{ label: "Analytics" }, { label: "Distortions" }] },
+  "data-quality": { title: "Data Quality", breadcrumb: [{ label: "Analytics" }, { label: "Data Quality" }] },
   audit: { title: "Audit Trail", breadcrumb: [{ label: "Operations" }, { label: "Audit" }] },
   benchmarks: { title: "Benchmark Suite", breadcrumb: [{ label: "Operations" }, { label: "Benchmarks" }] },
   ci: { title: "CI Integration", breadcrumb: [{ label: "Operations" }, { label: "CI" }] },
@@ -45,12 +48,21 @@ const SECTION_META: Record<DashboardSectionKey, SectionMeta> = {
 
 const stagger = {
   initial: {},
-  animate: { transition: { staggerChildren: 0.06, delayChildren: 0.05 } },
+  animate: { transition: { staggerChildren: 0.04, delayChildren: 0.03 } },
 };
 
 const fadeIn = {
-  initial: { opacity: 0, y: 10 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.25, ease: "easeOut" as const } },
+  initial: { opacity: 0, y: 12 },
+  animate: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring" as const, stiffness: 300, damping: 30 },
+  },
+  exit: {
+    opacity: 0,
+    y: -6,
+    transition: { duration: 0.15, ease: "easeIn" as const },
+  },
 };
 
 function DashboardRootInner() {
@@ -59,13 +71,15 @@ function DashboardRootInner() {
   const [palettePulse, setPalettePulse] = useState(0); // bumped to ask AppShell to open palette
   const meta = useMemo(() => SECTION_META[section], [section]);
   const toast = useToast();
+  const { playTransition } = useSounds();
 
   const navigate = useCallback((next: DashboardSectionKey) => {
     setSection((prev) => {
       if (prev === next) return prev;
+      playTransition();
       return next;
     });
-  }, []);
+  }, [playTransition]);
 
   useGlobalShortcuts({
     onPaletteToggle: () => setPalettePulse((n) => n + 1),
@@ -202,6 +216,12 @@ function DashboardRootInner() {
           {section === "distortions" && (
             <motion.div variants={fadeIn}>
               <DistortionPreview />
+            </motion.div>
+          )}
+
+          {section === "data-quality" && (
+            <motion.div variants={fadeIn}>
+              <DataQuality />
             </motion.div>
           )}
 

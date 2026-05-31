@@ -384,6 +384,119 @@ export async function* askCopilot(
         }
       }
     }
+    } finally {
+    try {
+      reader.releaseLock();
+    } catch {
+      // ignored
+    }
+  }
+}
+
+// --- Data optimization (Adaption Labs) ---
+
+export interface DataOptimizeRequest {
+  texts: string[];
+  column_mapping: Record<string, string>;
+  estimate_only?: boolean;
+}
+
+export interface DataOptimizeResponse {
+  status: string;
+  run_id?: string | null;
+  optimized_count?: number | null;
+  quality?: Record<string, unknown> | null;
+  estimate?: { credits?: number; estimated_minutes?: number } | null;
+  elapsed_seconds?: number | null;
+  before_stats?: DataStats | null;
+  after_stats?: DataStats | null;
+  quality_delta?: { count_change?: number; avg_length_change?: number } | null;
+}
+
+export interface DataStats {
+  count: number;
+  avg_length: number;
+  total_chars: number;
+  avg_words: number;
+  min_length?: number;
+  max_length?: number;
+}
+
+export interface OptimizeStreamEvent {
+  event: "start" | "progress" | "complete" | "error";
+  run_id: string;
+  state?: string;
+  progress_pct?: number;
+  message?: string;
+  result?: { optimized_count?: number; quality?: Record<string, unknown> } | null;
+  before_stats?: DataStats | null;
+  after_stats?: DataStats | null;
+  elapsed_seconds?: number;
+  error?: string;
+}
+
+export function optimizeData(body: DataOptimizeRequest): Promise<DataOptimizeResponse> {
+  return apiFetch<DataOptimizeResponse>("/api/v1/data/optimize", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+export async function* optimizeDataStream(
+  body: DataOptimizeRequest,
+  signal?: AbortSignal,
+): AsyncGenerator<OptimizeStreamEvent, void, void> {
+  const res = await fetch(`${getApiBase()}/api/v1/data/optimize/stream`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "text/event-stream",
+    },
+    body: JSON.stringify(body),
+    signal,
+  });
+  if (!res.ok) {
+    let detail = `Optimization error ${res.status}`;
+    try {
+      const errBody = await res.json();
+      detail = errBody.detail || errBody.error || detail;
+    } catch {
+      // non-JSON response
+    }
+    throw new Error(detail);
+  }
+  if (!res.body) {
+    throw new Error("No stream body returned");
+  }
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder("utf-8");
+  let buffer = "";
+
+  try {
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      let sepIdx = buffer.indexOf("\n\n");
+      while (sepIdx !== -1) {
+        const raw = buffer.slice(0, sepIdx);
+        buffer = buffer.slice(sepIdx + 2);
+        sepIdx = buffer.indexOf("\n\n");
+
+        for (const line of raw.split(/\r?\n/)) {
+          if (!line.startsWith("data:")) continue;
+          const payload = line.slice(5).trim();
+          if (!payload) continue;
+          try {
+            yield JSON.parse(payload) as OptimizeStreamEvent;
+          } catch {
+            // skip malformed
+          }
+        }
+      }
+    }
   } finally {
     try {
       reader.releaseLock();
@@ -391,4 +504,31 @@ export async function* askCopilot(
       // ignored
     }
   }
+}
+
+// --- Config suggestions ---
+
+export interface ConfigSuggestion {
+  param: string;
+  current: unknown;
+  suggested: unknown;
+  reason: string;
+}
+
+export interface SuggestConfigRequest {
+  current_config: Record<string, unknown>;
+  last_metrics?: Record<string, unknown>;
+  hardware?: string;
+}
+
+export interface SuggestConfigResponse {
+  suggestions: ConfigSuggestion[];
+  model: string;
+}
+
+export function suggestConfig(body: SuggestConfigRequest): Promise<SuggestConfigResponse> {
+  return apiFetch<SuggestConfigResponse>("/api/v1/suggest/config", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
 }

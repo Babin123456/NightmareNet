@@ -2,6 +2,7 @@
 
 import { motion, type HTMLMotionProps } from "framer-motion";
 import { forwardRef, type ReactNode } from "react";
+import { useSounds } from "@/lib/sounds";
 
 type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 type ButtonSize = "sm" | "md" | "lg";
@@ -38,10 +39,18 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       className = "",
       children,
       disabled,
+      onMouseDown,
       ...props
     },
     ref
   ) => {
+    const { playClick } = useSounds();
+
+    const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (e.detail !== 0) playClick();
+      onMouseDown?.(e);
+    };
+
     return (
       <motion.button
         ref={ref}
@@ -56,6 +65,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           className,
         ].join(" ")}
         disabled={disabled || loading}
+        onMouseDown={handleMouseDown}
         {...props}
       >
         {loading ? (

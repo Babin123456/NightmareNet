@@ -7,14 +7,16 @@ import { Badge } from "@/components/ui/Badge";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { useToast } from "@/components/ui/Toast";
+import { useSounds } from "@/lib/sounds";
 import { IconKey, IconSettings, IconShield, IconWand } from "./icons";
 
-type Tab = "keys" | "model" | "distortion";
+type Tab = "keys" | "model" | "distortion" | "integrations";
 
 const TABS: { key: Tab; label: string; icon: React.ReactNode }[] = [
   { key: "keys", label: "API Keys", icon: <IconKey size={12} /> },
   { key: "model", label: "Model", icon: <IconShield size={12} /> },
   { key: "distortion", label: "Distortion", icon: <IconWand size={12} /> },
+  { key: "integrations", label: "Integrations", icon: <IconSettings size={12} /> },
 ];
 
 interface ApiKey {
@@ -40,7 +42,13 @@ export function SettingsPanel() {
   const [dreamStrength, setDreamStrength] = useState("0.25");
   const [nightmareStrength, setNightmareStrength] = useState("0.80");
   const [seed, setSeed] = useState("42");
+  const [azureEndpoint, setAzureEndpoint] = useState("");
+  const [azureKey, setAzureKey] = useState("");
+  const [adaptionLabsKey, setAdaptionLabsKey] = useState("");
+  const [huggingfaceToken, setHuggingfaceToken] = useState("");
+  const [wandbKey, setWandbKey] = useState("");
   const toast = useToast();
+  const sounds = useSounds();
 
   return (
     <Panel
@@ -50,6 +58,42 @@ export function SettingsPanel() {
       glow="dream"
       toolbar={<Badge variant="outline" size="xs">workspace · adit</Badge>}
     >
+      {/* Sound preference toggle */}
+      <div className="mb-4 flex items-center justify-between rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2">
+        <div className="flex items-center gap-2">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true" className="text-slate-400">
+            <path d="M2.5 5.5h2L7 3v8L4.5 8.5h-2a.5.5 0 01-.5-.5V6a.5.5 0 01.5-.5z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
+            {sounds.enabled && (
+              <>
+                <path d="M9 5.2a2.5 2.5 0 010 3.6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                <path d="M10.5 3.8a4.5 4.5 0 010 6.4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+              </>
+            )}
+            {!sounds.enabled && (
+              <path d="M9.5 5L12 8M12 5L9.5 8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+            )}
+          </svg>
+          <span className="text-[11px] text-slate-300">UI Sounds</span>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={sounds.enabled}
+          onClick={sounds.toggle}
+          className={[
+            "relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors",
+            sounds.enabled ? "bg-neural/40" : "bg-white/[0.08]",
+          ].join(" ")}
+        >
+          <span
+            className={[
+              "inline-block h-3.5 w-3.5 rounded-full bg-white shadow-sm transition-transform",
+              sounds.enabled ? "translate-x-[18px]" : "translate-x-[3px]",
+            ].join(" ")}
+          />
+        </button>
+      </div>
+
       <div className="mb-4 flex flex-wrap gap-1 border-b border-white/[0.06] pb-2">
         {TABS.map((t) => {
           const active = t.key === tab;
@@ -60,7 +104,7 @@ export function SettingsPanel() {
               onClick={() => setTab(t.key)}
               className={[
                 "inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[11px] cursor-pointer transition-colors",
-                active ? "bg-neural/[0.08] text-neural" : "text-slate-500 hover:bg-white/[0.04] hover:text-slate-300",
+                active ? "bg-neural/[0.08] text-neural" : "text-slate-400 hover:bg-white/[0.04] hover:text-slate-300",
               ].join(" ")}
               aria-pressed={active}
             >
@@ -87,7 +131,7 @@ export function SettingsPanel() {
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm text-slate-100">{k.name}</p>
-                  <p className="font-mono text-[10px] text-slate-500">
+                  <p className="font-mono text-[10px] text-slate-400">
                     {k.preview} · scope {k.scope} · created {k.created} · last used {k.lastUsed}
                   </p>
                 </div>
@@ -121,7 +165,13 @@ export function SettingsPanel() {
           <Input label="Learning rate" value={lr} onChange={(e) => setLr(e.target.value)} hint="Wake/Dream phases" />
           <Input label="Random seed" value={seed} onChange={(e) => setSeed(e.target.value)} type="number" />
           <div className="sm:col-span-2 flex justify-end gap-2">
-            <Button variant="ghost" size="sm">Reset</Button>
+            <Button variant="ghost" size="sm" onClick={() => {
+              setModel("distilbert-base-uncased");
+              setBatch("8");
+              setLr("5e-5");
+              setSeed("42");
+              toast.push({ title: "Defaults restored", variant: "info" });
+            }}>Reset</Button>
             <Button variant="primary" size="sm" onClick={() => toast.push({ title: "Settings saved", variant: "success" })}>
               Save defaults
             </Button>
@@ -136,7 +186,7 @@ export function SettingsPanel() {
             <Input label="Nightmare strength" value={nightmareStrength} onChange={(e) => setNightmareStrength(e.target.value)} hint="0.50 — 1.00" />
           </div>
           <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
-            <p className="mb-1.5 text-[10px] uppercase tracking-widest text-slate-500">Distortion mix</p>
+            <p className="mb-1.5 text-[10px] uppercase tracking-widest text-slate-400">Distortion mix</p>
             <ul className="space-y-1.5 text-[11px]">
               {[
                 { label: "Character (typos · swaps · deletes)", weight: 35 },
@@ -157,6 +207,63 @@ export function SettingsPanel() {
           <div className="flex justify-end">
             <Button variant="primary" size="sm" onClick={() => toast.push({ title: "Distortion mix saved", variant: "success" })}>
               Save mix
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {tab === "integrations" && (
+        <div className="space-y-4">
+          <p className="text-[11px] text-slate-400">Connect external services for model training, evaluation, and experiment tracking.</p>
+
+          <div className="space-y-3">
+            <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
+              <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-slate-400">Azure OpenAI</p>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                <Input label="Endpoint" value={azureEndpoint} onChange={(e) => setAzureEndpoint(e.target.value)} hint="https://your-resource.openai.azure.com" />
+                <Input label="API Key" value={azureKey} onChange={(e) => setAzureKey(e.target.value)} type="password" />
+              </div>
+              <div className="mt-2 flex justify-end">
+                <Button variant="ghost" size="sm" onClick={() => toast.push({ title: "Azure OpenAI connected", variant: "success" })}>
+                  Test Connection
+                </Button>
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
+              <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-slate-400">Adaption Labs</p>
+              <Input label="API Key" value={adaptionLabsKey} onChange={(e) => setAdaptionLabsKey(e.target.value)} type="password" />
+              <div className="mt-2 flex justify-end">
+                <Button variant="ghost" size="sm" onClick={() => toast.push({ title: "Adaption Labs connected", variant: "success" })}>
+                  Test Connection
+                </Button>
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
+              <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-slate-400">HuggingFace</p>
+              <Input label="Access Token" value={huggingfaceToken} onChange={(e) => setHuggingfaceToken(e.target.value)} type="password" hint="hf_***" />
+              <div className="mt-2 flex justify-end">
+                <Button variant="ghost" size="sm" onClick={() => toast.push({ title: "HuggingFace connected", variant: "success" })}>
+                  Test Connection
+                </Button>
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
+              <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-slate-400">Weights & Biases</p>
+              <Input label="API Key" value={wandbKey} onChange={(e) => setWandbKey(e.target.value)} type="password" />
+              <div className="mt-2 flex justify-end">
+                <Button variant="ghost" size="sm" onClick={() => toast.push({ title: "W&B connected", variant: "success" })}>
+                  Test Connection
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end">
+            <Button variant="primary" size="sm" onClick={() => toast.push({ title: "Integrations saved", variant: "success" })}>
+              Save all
             </Button>
           </div>
         </div>

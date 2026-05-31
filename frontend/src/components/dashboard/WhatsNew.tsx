@@ -95,7 +95,7 @@ export function WhatsNew() {
                 What&apos;s new
               </span>
               {build ? (
-                <span className="font-mono text-[10px] text-slate-500">
+                <span className="font-mono text-[10px] text-slate-400">
                   · {build.slice(0, 10)}
                 </span>
               ) : null}
@@ -104,7 +104,7 @@ export function WhatsNew() {
               type="button"
               onClick={dismiss}
               aria-label="Dismiss what's new"
-              className="cursor-pointer rounded-md px-1.5 py-0.5 text-[11px] text-slate-500 hover:bg-white/5 hover:text-slate-300"
+              className="cursor-pointer rounded-md px-1.5 py-0.5 text-[11px] text-slate-400 hover:bg-white/5 hover:text-slate-300"
             >
               Esc
             </button>

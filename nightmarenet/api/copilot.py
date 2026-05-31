@@ -27,6 +27,7 @@ import asyncio
 import json
 import logging
 import os
+import time
 from typing import Any, AsyncIterator, Dict, List, Optional
 
 from fastapi import Body, FastAPI, Request
@@ -73,6 +74,7 @@ VALID_SECTIONS = frozenset(
         "benchmarks",
         "ci",
         "settings",
+        "data-quality",
     }
 )
 
@@ -248,6 +250,25 @@ CONTEXTUAL_HINTS: Dict[str, Dict[str, Any]] = {
             }
         ],
     },
+    "data-quality": {
+        "hint": (
+            "Adaption Labs optimization can improve dataset quality before training — "
+            "deduplication, noise filtering, and curriculum scoring typically boost "
+            "robustness by 3-8% with no architecture changes."
+        ),
+        "next": [
+            {
+                "label": "Run Data Optimization",
+                "action": "data-quality",
+                "detail": "Adaption Labs \u00b7 denoise + deduplicate + score",
+            },
+            {
+                "label": "View Quality Metrics",
+                "action": "metrics",
+                "detail": "Dataset health: duplicates, noise ratio, coverage",
+            },
+        ],
+    },
 }
 
 _DEFAULT_HINT_ENTRY: Dict[str, Any] = {
@@ -326,9 +347,20 @@ def _section_entry(section: str) -> Dict[str, Any]:
 def _detect_llm_backend() -> Optional[str]:
     """Return the name of an available LLM backend, or ``None`` for heuristic.
 
-    Order: OpenAI > Anthropic > Azure OpenAI. SDK availability is checked
-    lazily so the OSS install path never requires these packages.
+    Order: Azure OpenAI > OpenAI > Anthropic.
+    SDK availability is checked lazily so the OSS install path never requires
+    these packages.
     """
+    if os.environ.get("AZURE_OPENAI_API_KEY") and os.environ.get(
+        "AZURE_OPENAI_ENDPOINT"
+    ):
+        try:
+            import openai  # noqa: F401
+            return "azure"
+        except ImportError:
+            logger.debug(
+                "AZURE_OPENAI_API_KEY set but `openai` SDK not importable"
+            )
     if os.environ.get("OPENAI_API_KEY"):
         try:
             import openai  # noqa: F401
@@ -341,16 +373,6 @@ def _detect_llm_backend() -> Optional[str]:
             return "anthropic"
         except ImportError:
             logger.debug("ANTHROPIC_API_KEY set but `anthropic` SDK not importable")
-    if os.environ.get("AZURE_OPENAI_API_KEY") and os.environ.get(
-        "AZURE_OPENAI_ENDPOINT"
-    ):
-        try:
-            import openai  # noqa: F401
-            return "azure"
-        except ImportError:
-            logger.debug(
-                "AZURE_OPENAI_API_KEY set but `openai` SDK not importable"
-            )
     return None
 
 
@@ -588,14 +610,17 @@ async def _build_sse_stream(body: CopilotAskRequest) -> AsyncIterator[str]:
 
     if backend in _LLM_DISPATCH:
         stream_fn, model_id_fn = _LLM_DISPATCH[backend]
+        start_time = time.time()
         try:
             async for token in stream_fn(body.question, section, body.context):
                 yield _sse({"token": token})
+            latency_ms = round((time.time() - start_time) * 1000, 1)
             yield _sse(
                 {
                     "done": True,
                     "suggestions": suggestions,
                     "model": model_id_fn(),
+                    "latency_ms": latency_ms,
                 }
             )
             return
@@ -606,10 +631,19 @@ async def _build_sse_stream(body: CopilotAskRequest) -> AsyncIterator[str]:
                 exc,
             )
 
+    start_time = time.time()
     answer = _heuristic_answer_text(section, body.question, body.context)
     async for token in _heuristic_token_stream(answer):
         yield _sse({"token": token})
-    yield _sse({"done": True, "suggestions": suggestions, "model": "heuristic"})
+    latency_ms = round((time.time() - start_time) * 1000, 1)
+    yield _sse(
+        {
+            "done": True,
+            "suggestions": suggestions,
+            "model": "heuristic",
+            "latency_ms": latency_ms,
+        }
+    )
 
 
 async def _build_non_stream_response(body: CopilotAskRequest) -> Dict[str, Any]:

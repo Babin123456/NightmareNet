@@ -17,9 +17,9 @@ export interface PanelProps {
 }
 
 const glowMap = {
-  neural: "shadow-[0_0_24px_rgba(34,211,238,0.06)] hover:border-neural/20",
-  dream: "shadow-[0_0_24px_rgba(129,140,248,0.06)] hover:border-dream/20",
-  nightmare: "shadow-[0_0_24px_rgba(248,113,113,0.05)] hover:border-nightmare/20",
+  neural: "hover:border-neural/20",
+  dream: "hover:border-dream/20",
+  nightmare: "hover:border-nightmare/20",
   none: "",
 };
 
@@ -41,12 +41,19 @@ export function Panel({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeOut", delay: delayMs / 1000 }}
       className={[
-        "flex h-full flex-col overflow-hidden rounded-xl border border-white/[0.06] bg-abyss/40 backdrop-blur-md",
-        "transition-colors",
+        "relative flex h-full flex-col overflow-hidden rounded-xl",
+        "border border-white/[0.06] hover:border-white/[0.12]",
+        "bg-[rgba(2,6,23,0.72)] backdrop-blur-[12px] backdrop-saturate-[1.15]",
+        "shadow-[0_8px_32px_rgba(0,0,0,0.4)]",
+        "transition-[border-color] duration-200 ease-out",
         glowMap[glow],
         className,
       ].join(" ")}
     >
+      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden rounded-xl">
+        <div className="absolute -left-1/4 -top-1/4 h-1/2 w-1/2 animate-[blob_20s_ease-in-out_infinite] rounded-full bg-dream/[0.06] blur-[80px]" />
+        <div className="absolute -bottom-1/4 -right-1/4 h-1/2 w-1/2 animate-[blob_20s_ease-in-out_infinite_10s] rounded-full bg-neural/[0.04] blur-[80px]" />
+      </div>
       <header className="flex items-start justify-between gap-3 border-b border-white/[0.04] px-4 py-3">
         <div className="flex min-w-0 items-start gap-2.5">
           {icon && (
@@ -59,7 +66,7 @@ export function Panel({
               {title}
             </h3>
             {subtitle && (
-              <p className="mt-0.5 truncate text-[11px] text-slate-500">{subtitle}</p>
+              <p className="mt-0.5 truncate text-[11px] text-slate-400">{subtitle}</p>
             )}
           </div>
         </div>

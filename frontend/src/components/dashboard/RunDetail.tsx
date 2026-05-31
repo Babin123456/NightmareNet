@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Panel } from "./Panel";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Progress } from "@/components/ui/Progress";
 import { useToast } from "@/components/ui/Toast";
+import { cancelPipeline, getPipelineReport } from "@/lib/api";
 import {
   IconActivity,
   IconClock,
@@ -232,7 +233,7 @@ function ReRunMenu({ config }: { config: RunConfig }) {
             className="absolute right-0 top-full z-30 mt-2 w-80 overflow-hidden rounded-xl border border-white/[0.08] bg-abyss/95 shadow-[0_20px_60px_rgba(0,0,0,0.55)] backdrop-blur-xl"
           >
             <div className="border-b border-white/[0.06] px-3 py-2">
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
                 Re-run with mutated config
               </p>
               <p className="mt-0.5 text-[11px] text-slate-400">
@@ -269,7 +270,7 @@ function ReRunMenu({ config }: { config: RunConfig }) {
                         ↵
                       </span>
                     </span>
-                    <span className="text-[11px] text-slate-500">{preset.detail}</span>
+                    <span className="text-[11px] text-slate-400">{preset.detail}</span>
                     <span className="font-mono text-[10.5px] text-slate-400">
                       {preset.diff(config)}
                     </span>
@@ -277,7 +278,7 @@ function ReRunMenu({ config }: { config: RunConfig }) {
                 </li>
               ))}
             </ul>
-            <div className="border-t border-white/[0.06] px-3 py-2 text-[10px] text-slate-500">
+            <div className="border-t border-white/[0.06] px-3 py-2 text-[10px] text-slate-400">
               <span className="font-mono">esc</span> to close ·{" "}
               <span className="font-mono">↑↓</span> to navigate ·{" "}
               <span className="font-mono">↵</span> to launch
@@ -303,12 +304,12 @@ function PhaseTimeline({ active }: { active: PhaseTab }) {
                 "flex h-8 w-8 items-center justify-center rounded-full border-2 bg-abyss",
                 isActive
                   ? `border-${tab.tone} text-${tab.tone} shadow-[0_0_14px_currentColor]`
-                  : "border-white/10 text-slate-500",
+                  : "border-white/10 text-slate-400",
               ].join(" ")}
             >
               <span className="font-mono text-[11px]">{tab.label[0]}</span>
             </motion.div>
-            <span className={isActive ? `text-[11px] text-${tab.tone}` : "text-[11px] text-slate-500"}>
+            <span className={isActive ? `text-[11px] text-${tab.tone}` : "text-[11px] text-slate-400"}>
               {tab.label}
             </span>
           </div>
@@ -320,8 +321,46 @@ function PhaseTimeline({ active }: { active: PhaseTab }) {
 
 export function RunDetail() {
   const [active, setActive] = useState<PhaseTab>("dream");
+  const [cancelling, setCancelling] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const toast = useToast();
   const tab = TABS.find((t) => t.key === active)!;
   const data = PHASE_DATA[active];
+
+  const runId = "exp_4f0a";
+
+  const handleCancel = useCallback(async () => {
+    setCancelling(true);
+    try {
+      await cancelPipeline(runId);
+      toast.push({ title: "Run cancelled", description: `${runId} has been stopped.`, variant: "warning" });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Cancel failed";
+      toast.push({ title: "Cancel failed", description: msg, variant: "error" });
+    } finally {
+      setCancelling(false);
+    }
+  }, [toast]);
+
+  const handleDownloadReport = useCallback(async () => {
+    setDownloading(true);
+    try {
+      const report = await getPipelineReport(runId);
+      const blob = new Blob([report.report_md], { type: "text/markdown" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${runId}-report.md`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.push({ title: "Report downloaded", variant: "success" });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Download failed";
+      toast.push({ title: "Download failed", description: msg, variant: "error" });
+    } finally {
+      setDownloading(false);
+    }
+  }, [toast]);
 
   return (
     <Panel
@@ -333,10 +372,10 @@ export function RunDetail() {
         <>
           <Badge variant="neural" size="xs" dot>running</Badge>
           <ReRunMenu config={BASE_CONFIG} />
-          <Button variant="ghost" size="sm" aria-label="Download report">
+          <Button variant="ghost" size="sm" aria-label="Download report" onClick={handleDownloadReport} loading={downloading} disabled={downloading}>
             <IconDownload size={12} />
           </Button>
-          <Button variant="danger" size="sm">Cancel</Button>
+          <Button variant="danger" size="sm" onClick={handleCancel} loading={cancelling} disabled={cancelling}>Cancel</Button>
         </>
       }
     >
@@ -354,7 +393,7 @@ export function RunDetail() {
                 "rounded-md px-2.5 py-1 text-[11px] font-medium tracking-wide cursor-pointer transition-colors",
                 a
                   ? `bg-${t.tone}/10 text-${t.tone}`
-                  : "text-slate-500 hover:bg-white/[0.04] hover:text-slate-200",
+                  : "text-slate-400 hover:bg-white/[0.04] hover:text-slate-200",
               ].join(" ")}
               aria-pressed={a}
             >
@@ -378,7 +417,7 @@ export function RunDetail() {
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {data.metrics.map((m) => (
               <div key={m.label} className="rounded-md border border-white/[0.06] bg-white/[0.02] p-2.5">
-                <p className="text-[10px] uppercase tracking-widest text-slate-500">{m.label}</p>
+                <p className="text-[10px] uppercase tracking-widest text-slate-400">{m.label}</p>
                 <p className="mt-0.5 font-mono text-sm text-slate-100">{m.value}</p>
               </div>
             ))}
@@ -388,33 +427,33 @@ export function RunDetail() {
             <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
               <div className="mb-1.5 flex items-center gap-1.5">
                 <IconActivity size={11} />
-                <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
                   Loss
                 </span>
               </div>
               <p className="font-mono text-base text-slate-100">
                 {data.lossStart.toFixed(2)} → {data.lossEnd.toFixed(2)}
               </p>
-              <p className="text-[10px] text-slate-500">
+              <p className="text-[10px] text-slate-400">
                 Δ {(data.lossEnd - data.lossStart).toFixed(2)}
               </p>
             </div>
             <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
               <div className="mb-1.5 flex items-center gap-1.5">
                 <IconClock size={11} />
-                <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
                   Epochs · Samples
                 </span>
               </div>
               <p className="font-mono text-base text-slate-100">
                 {data.epochs} · {data.samples}
               </p>
-              <p className="text-[10px] text-slate-500">batch_size = 8</p>
+              <p className="text-[10px] text-slate-400">batch_size = 8</p>
             </div>
             <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
               <div className="mb-1.5 flex items-center gap-1.5">
                 <IconSparkle size={11} />
-                <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
                   Phase progress
                 </span>
               </div>

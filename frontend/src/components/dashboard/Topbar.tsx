@@ -28,7 +28,7 @@ export function Topbar({
       <div className="flex min-w-0 items-center gap-2">
         <h1 className="truncate text-sm font-semibold text-slate-100">{title}</h1>
         {breadcrumb.length > 0 && (
-          <nav className="hidden items-center gap-1 text-xs text-slate-500 md:flex" aria-label="Breadcrumb">
+          <nav className="hidden items-center gap-1 text-xs text-slate-400 md:flex" aria-label="Breadcrumb">
             <span>·</span>
             {breadcrumb.map((b, i) => (
               <span key={i} className="flex items-center gap-1">

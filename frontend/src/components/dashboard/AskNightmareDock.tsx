@@ -351,7 +351,7 @@ export function AskNightmareDock({ section, onNavigate }: AskNightmareDockProps)
                   setOpen(false);
                 }}
                 aria-label="Close copilot"
-                className="cursor-pointer rounded-md px-1.5 py-0.5 text-[11px] text-slate-500 hover:bg-white/5 hover:text-slate-300"
+                className="cursor-pointer rounded-md px-1.5 py-0.5 text-[11px] text-slate-400 hover:bg-white/5 hover:text-slate-300"
               >
                 Esc
               </button>
@@ -366,7 +366,7 @@ export function AskNightmareDock({ section, onNavigate }: AskNightmareDockProps)
                 <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-neural">
                   Context · {section}
                   {ask.status === "streaming" && (
-                    <span className="ml-2 inline-flex items-center gap-1 normal-case tracking-normal text-slate-500">
+                    <span className="ml-2 inline-flex items-center gap-1 normal-case tracking-normal text-slate-400">
                       <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-neural" />
                       thinking…
                     </span>
@@ -403,7 +403,7 @@ export function AskNightmareDock({ section, onNavigate }: AskNightmareDockProps)
                       </span>
                       <span className="flex-1">
                         <span className="block text-[13px] text-slate-200">{s.label}</span>
-                        <span className="block text-[11px] text-slate-500">{s.detail}</span>
+                        <span className="block text-[11px] text-slate-400">{s.detail}</span>
                       </span>
                     </button>
                   ))}
@@ -442,7 +442,7 @@ export function AskNightmareDock({ section, onNavigate }: AskNightmareDockProps)
                 <p className="flex items-center justify-between pt-1.5 text-[10px] text-slate-600">
                   <span>Streaming SSE · context-aware</span>
                   {modelLabel && (
-                    <span className="font-mono text-slate-500">
+                    <span className="font-mono text-slate-400">
                       powered by {modelLabel}
                     </span>
                   )}

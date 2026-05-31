@@ -27,7 +27,7 @@ interface DistortionState {
 const empty = (): DistortionState => ({ loading: false, result: null, error: null });
 
 function DiffText({ original, distorted }: { original: string; distorted: string }) {
-  if (!original || !distorted) return <span className="text-slate-500">—</span>;
+  if (!original || !distorted) return <span className="text-slate-400">—</span>;
   const oWords = original.split(/(\s+)/);
   const dWords = distorted.split(/(\s+)/);
   const same = (i: number) => oWords[i] && oWords[i] === dWords[i];
@@ -122,7 +122,7 @@ export function DistortionPreview() {
     >
       <div className="space-y-3">
         <div>
-          <div className="mb-1.5 flex items-center justify-between text-[10px] uppercase tracking-widest text-slate-500">
+          <div className="mb-1.5 flex items-center justify-between text-[10px] uppercase tracking-widest text-slate-400">
             <span>Source text</span>
             <span className="font-mono normal-case text-slate-400">{text.length} chars</span>
           </div>
@@ -135,7 +135,7 @@ export function DistortionPreview() {
         </div>
 
         <div className="flex items-center gap-3">
-          <label className="text-[10px] uppercase tracking-widest text-slate-500">Strength</label>
+          <label className="text-[10px] uppercase tracking-widest text-slate-400">Strength</label>
           <input
             type="range"
             min={0.1}
@@ -161,7 +161,7 @@ export function DistortionPreview() {
             ) : dream.result ? (
               <DiffText original={text} distorted={dream.result.distorted_text} />
             ) : (
-              <p className="text-[12px] italic text-slate-500">Click Distort to call /api/v1/generate/dream</p>
+              <p className="text-[12px] italic text-slate-400">Click Distort to call /api/v1/generate/dream</p>
             )}
           </motion.div>
 
@@ -177,7 +177,7 @@ export function DistortionPreview() {
             ) : nightmare.result ? (
               <DiffText original={text} distorted={nightmare.result.distorted_text} />
             ) : (
-              <p className="text-[12px] italic text-slate-500">Click Distort to call /api/v1/generate/nightmare</p>
+              <p className="text-[12px] italic text-slate-400">Click Distort to call /api/v1/generate/nightmare</p>
             )}
           </motion.div>
         </div>

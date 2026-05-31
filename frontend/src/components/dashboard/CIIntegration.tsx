@@ -119,7 +119,7 @@ jobs:
                       ? "border-neural/40 bg-neural/[0.08] text-neural"
                       : done
                         ? "border-emerald-500/30 bg-emerald-500/[0.05] text-emerald-300"
-                        : "border-white/[0.05] bg-white/[0.02] text-slate-500",
+                        : "border-white/[0.05] bg-white/[0.02] text-slate-400",
                   ].join(" ")}
                 >
                   {s.label}
@@ -157,11 +157,11 @@ jobs:
         <div className="space-y-3">
           <p className="text-[12px] text-slate-400">Add your NightmareNet API key as a repository secret named <span className="font-mono text-slate-200">NIGHTMARENET_API_KEY</span>.</p>
           <div className="rounded-lg border border-white/[0.06] bg-black/40 p-3 font-mono text-[11px] text-slate-300">
-            <span className="text-slate-500"># In Settings → Secrets → Actions</span>
+            <span className="text-slate-400"># In Settings → Secrets → Actions</span>
             <br />
             gh secret set NIGHTMARENET_API_KEY --body &quot;rk_*****&quot;
           </div>
-          <Button variant="ghost" size="sm" onClick={() => { toast.push({ title: "Copied", variant: "success" }); }}>
+          <Button variant="ghost" size="sm" onClick={() => { copyToClipboard("gh secret set NIGHTMARENET_API_KEY --body \"rk_*****\"", "Command"); }}>
             <IconCheck size={12} /> Copy command
           </Button>
         </div>
@@ -174,10 +174,19 @@ jobs:
             <code>{yaml}</code>
           </pre>
           <div className="flex items-center gap-2">
-            <Button variant="primary" size="sm">
+            <Button variant="primary" size="sm" onClick={() => {
+              const blob = new Blob([yaml], { type: "text/yaml" });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = "nightmarenet.yml";
+              a.click();
+              URL.revokeObjectURL(url);
+              toast.push({ title: "YAML downloaded", variant: "success" });
+            }}>
               <IconDownload size={12} /> Download YAML
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => toast.push({ title: "YAML copied", variant: "success" })}>
+            <Button variant="ghost" size="sm" onClick={() => { copyToClipboard(yaml, "YAML"); }}>
               Copy
             </Button>
           </div>
@@ -197,16 +206,16 @@ jobs:
           </div>
           <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
             <div className="mb-2 flex items-center justify-between">
-              <p className="text-[10px] uppercase tracking-widest text-slate-500">
+              <p className="text-[10px] uppercase tracking-widest text-slate-400">
                 Embed badge
               </p>
-              <span className="font-mono text-[10px] text-slate-500">
+              <span className="font-mono text-[10px] text-slate-400">
                 score {scoreText} · auto-refreshes hourly
               </span>
             </div>
 
             <div className="mb-3 flex flex-wrap items-center gap-3 rounded-md border border-white/[0.05] bg-black/40 px-3 py-2">
-              <span className="text-[10px] uppercase tracking-widest text-slate-500">
+              <span className="text-[10px] uppercase tracking-widest text-slate-400">
                 Live preview
               </span>
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -217,14 +226,14 @@ jobs:
                 height={20}
                 className="select-none"
               />
-              <span className="ml-auto text-[10px] text-slate-500">
+              <span className="ml-auto text-[10px] text-slate-400">
                 served by <span className="font-mono">{publicBadgeUrl.replace("https://", "")}</span>
               </span>
             </div>
 
             <div className="space-y-2">
               <div>
-                <p className="mb-1 flex items-center justify-between text-[10px] uppercase tracking-widest text-slate-500">
+                <p className="mb-1 flex items-center justify-between text-[10px] uppercase tracking-widest text-slate-400">
                   <span>Markdown</span>
                   <Button
                     variant="ghost"
@@ -240,7 +249,7 @@ jobs:
                 </pre>
               </div>
               <div>
-                <p className="mb-1 flex items-center justify-between text-[10px] uppercase tracking-widest text-slate-500">
+                <p className="mb-1 flex items-center justify-between text-[10px] uppercase tracking-widest text-slate-400">
                   <span>HTML</span>
                   <Button
                     variant="ghost"
@@ -256,7 +265,7 @@ jobs:
                 </pre>
               </div>
             </div>
-            <p className="mt-2 text-[10px] text-slate-500">
+            <p className="mt-2 text-[10px] text-slate-400">
               Tip: replace <span className="font-mono">{scoreText}</span> with{" "}
               <span className="font-mono">{"{score}"}</span> in the URL to expose any score in
               the [0, 1] range — useful for per-branch badges or per-repo dashboards.

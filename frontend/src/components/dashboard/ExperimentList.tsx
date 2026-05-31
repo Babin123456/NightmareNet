@@ -317,7 +317,7 @@ export function ExperimentList({
       cell: (r) => (
         <div className="min-w-0">
           <p className="truncate text-sm text-slate-100">{r.name}</p>
-          <p className="font-mono text-[10px] text-slate-500">{r.id}</p>
+          <p className="font-mono text-[10px] text-slate-400">{r.id}</p>
         </div>
       ),
     },
@@ -380,7 +380,7 @@ export function ExperimentList({
       header: "Created",
       accessor: (r) => r.createdAt,
       align: "right",
-      cell: (r) => <span className="text-[11px] text-slate-500">{r.createdAt}</span>,
+      cell: (r) => <span className="text-[11px] text-slate-400">{r.createdAt}</span>,
     },
     {
       key: "actions",
@@ -421,10 +421,22 @@ export function ExperimentList({
               { value: "queued", label: "Queued" },
             ]}
           />
-          <Button variant="ghost" size="sm" aria-label="Filter">
+          <Button variant="ghost" size="sm" aria-label="Filter" onClick={() => setFilter(filter === "all" ? "running" : "all")} title="Toggle running filter">
             <IconFilter size={12} />
           </Button>
-          <Button variant="ghost" size="sm" aria-label="Export">
+          <Button variant="ghost" size="sm" aria-label="Export" onClick={() => {
+            const csv = ["id,name,model,status,cycles,robustness,duration,created"]
+              .concat(rows.map(r => `${r.id},${r.name},${r.model},${r.status},${r.cycles},${r.robustness},${r.duration},${r.createdAt}`))
+              .join("\n");
+            const blob = new Blob([csv], { type: "text/csv" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "experiments.csv";
+            a.click();
+            URL.revokeObjectURL(url);
+            toast.push({ title: "Exported experiments", description: `${rows.length} rows as CSV`, variant: "success" });
+          }}>
             <IconDownload size={12} />
           </Button>
           <Button variant="primary" size="sm" onClick={handleStartFirst}>

@@ -5,6 +5,7 @@ import { Panel } from "./Panel";
 import { Badge } from "@/components/ui/Badge";
 import { CircularProgress, Progress } from "@/components/ui/Progress";
 import { SkeletonChart, SkeletonStatTile } from "@/components/ui/Skeleton";
+import { useDemoMode } from "@/lib/hooks";
 import {
   IconActivity,
   IconBenchmark,
@@ -43,11 +44,11 @@ function MetricCard({ label, value, delta, tone = "neural", icon }: MetricCardPr
         {icon}
       </span>
       <div className="min-w-0">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
           {label}
         </p>
         <p className="mt-0.5 font-mono text-lg leading-none text-slate-100">{value}</p>
-        {delta && <p className="mt-1 text-[10px] text-slate-500">{delta}</p>}
+        {delta && <p className="mt-1 text-[10px] text-slate-400">{delta}</p>}
       </div>
     </div>
   );
@@ -106,7 +107,9 @@ export interface CommandCenterProps {
 }
 
 export function CommandCenter({ loading = false }: CommandCenterProps = {}) {
-  if (loading) {
+  const { isLive, isLoading } = useDemoMode();
+
+  if (loading || isLoading) {
     return (
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <Panel
@@ -141,6 +144,9 @@ export function CommandCenter({ loading = false }: CommandCenterProps = {}) {
         icon={<IconHome size={14} />}
         glow="neural"
         className="lg:col-span-2"
+        toolbar={
+          !isLive ? <Badge variant="warning" size="xs">demo data · API offline</Badge> : undefined
+        }
       >
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <MetricCard
@@ -178,7 +184,7 @@ export function CommandCenter({ loading = false }: CommandCenterProps = {}) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <IconTrend size={12} />
-                <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
                   Robustness Trend · 10 cycles
                 </span>
               </div>
@@ -192,7 +198,7 @@ export function CommandCenter({ loading = false }: CommandCenterProps = {}) {
           <div className="rounded-lg border border-white/[0.06] bg-white/[0.02] p-3">
             <div className="mb-2 flex items-center gap-1.5">
               <IconCpu size={12} />
-              <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
                 Cluster Utilization
               </span>
             </div>
@@ -233,7 +239,7 @@ export function CommandCenter({ loading = false }: CommandCenterProps = {}) {
           <CircularProgress value={82.4} size={120} thickness={8} tone="neural" showValue={false} />
           <div className="-mt-[88px] flex flex-col items-center pointer-events-none">
             <span className="font-mono text-2xl text-slate-100">82.4</span>
-            <span className="text-[10px] uppercase tracking-widest text-slate-500">Robustness</span>
+            <span className="text-[10px] uppercase tracking-widest text-slate-400">Robustness</span>
           </div>
           <div className="mt-12 grid w-full grid-cols-3 gap-2 text-center">
             {[
@@ -242,7 +248,7 @@ export function CommandCenter({ loading = false }: CommandCenterProps = {}) {
               { label: "Nightmare", value: "1.84", tone: "nightmare" as const },
             ].map((m) => (
               <div key={m.label} className="rounded-md border border-white/[0.06] bg-white/[0.02] py-1.5">
-                <p className="text-[10px] uppercase tracking-widest text-slate-500">{m.label}</p>
+                <p className="text-[10px] uppercase tracking-widest text-slate-400">{m.label}</p>
                 <p className={`font-mono text-sm text-${m.tone}`}>{m.value}</p>
               </div>
             ))}

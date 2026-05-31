@@ -4,6 +4,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Sidebar, type DashboardSectionKey } from "./Sidebar";
 import { Topbar } from "./Topbar";
 import { CommandPalette } from "./CommandPalette";
+import { NeuralCanvas } from "./NeuralCanvas";
 
 export interface AppShellProps {
   activeSection: DashboardSectionKey;
@@ -42,8 +43,9 @@ export function AppShell({
   }, [externalPaletteOpenPulse]);
 
   return (
-    <div className="min-h-screen bg-void text-slate-100">
-      <div className="flex">
+    <div className="relative min-h-screen bg-void text-slate-100">
+      <NeuralCanvas />
+      <div className="relative z-10 flex">
         <Sidebar activeSection={activeSection} onSectionChange={onSectionChange} />
         <div className="flex min-w-0 flex-1 flex-col">
           <Topbar
