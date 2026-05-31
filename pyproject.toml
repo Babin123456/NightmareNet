@@ -70,6 +70,12 @@ hosted = [
     "pyjwt>=2.8.0",
     "psycopg[binary]>=3.1.0",
 ]
+adaption = [
+    "adaption>=0.1.0",
+]
+ai = [
+    "openai>=1.30.0",
+]
 
 [project.urls]
 Homepage = "https://github.com/Adit-Jain-srm/NightmareNet"

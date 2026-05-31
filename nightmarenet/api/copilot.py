@@ -42,9 +42,21 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 SYSTEM_PROMPT = (
-    "You are NightmareNet's AI copilot. Answer in <= 3 sentences, "
-    "suggest one or two concrete next dashboard actions, "
-    "never invent metrics."
+    "You are NightmareNet's AI copilot — an expert in adversarial robustness, "
+    "the 4-phase Wake/Dream/Nightmare/Compress training cycle, and model "
+    "hardening. You have deep knowledge of:\n"
+    "- Distortion engines (character, word, semantic, adversarial, learned-attention)\n"
+    "- The +13.64% relative robustness improvement benchmark (SST-2, DistilBERT, seed 42)\n"
+    "- Pipeline lifecycle: ingest → optimize (Adaption Labs) → prepare → train → evaluate\n"
+    "- Supported configs: wake_epochs, dream/nightmare strength, compression ratio, batch size\n"
+    "- Hardware constraints: RTX 3050 Ti 4GB, FP16 AMP, gradient checkpointing, batch 4-16\n"
+    "\n"
+    "Rules:\n"
+    "- Answer in 3 sentences max.\n"
+    "- Suggest 1-2 concrete next dashboard actions.\n"
+    "- Never invent metrics; reference real numbers if available in context.\n"
+    "- If the user's question is about config tuning, reference the benchmark results.\n"
+    "- If dataset optimization is relevant, mention Adaption Labs integration."
 )
 
 VALID_SECTIONS = frozenset(
@@ -345,13 +357,56 @@ def _detect_llm_backend() -> Optional[str]:
 def _build_user_prompt(
     question: str, section: str, context: Optional[Dict[str, Any]]
 ) -> str:
-    """Render the user-side LLM prompt without leaking secrets."""
-    safe_context = json.dumps(context or {}, ensure_ascii=False, sort_keys=True)
+    """Render the user-side LLM prompt with enriched runtime context."""
+    ctx = dict(context) if context else {}
+
+    # Auto-inject live metrics from benchmark results if available
+    try:
+        import pathlib
+
+        bench_path = pathlib.Path("results/gpu_benchmark.json")
+        if bench_path.exists():
+            bench = json.loads(bench_path.read_text(encoding="utf-8"))
+            comparison = bench.get("comparison", {})
+            if comparison and "robustness_improvement_pct" not in ctx:
+                ctx["benchmark_robustness_improvement_pct"] = comparison.get(
+                    "robustness_improvement_pct"
+                )
+                ctx["benchmark_clean_delta"] = comparison.get("clean_delta")
+                ctx["benchmark_avg_distorted_delta"] = comparison.get("avg_distorted_delta")
+    except Exception:
+        pass
+
+    # Auto-inject available distortion engines
+    try:
+        from nightmarenet.distortions.registry import get_registry
+
+        reg = get_registry()
+        ctx["available_distortion_engines"] = list(reg._engines.keys())
+    except Exception:
+        pass
+
+    # Auto-inject pipeline runner state
+    try:
+        from nightmarenet.pipeline_runner import get_runner_registry
+
+        registry = get_runner_registry()
+        active = [
+            r for r in registry.values() if r.get("status") in ("running", "preparing")
+        ]
+        if active:
+            ctx["active_runs"] = len(active)
+    except Exception:
+        pass
+
+    safe_context = json.dumps(ctx, ensure_ascii=False, sort_keys=True, default=str)
     section_hint = _section_entry(section)["hint"]
+    temperature = float(os.environ.get("NIGHTMARENET_COPILOT_TEMPERATURE", "0.4"))
     return (
         f"Dashboard section: {section}\n"
         f"Section context hint: {section_hint}\n"
         f"Dashboard runtime context: {safe_context}\n"
+        f"Temperature setting: {temperature}\n"
         f"User question: {question}"
     )
 
@@ -469,7 +524,7 @@ async def _stream_azure(
         api_key=os.environ["AZURE_OPENAI_API_KEY"],
         azure_endpoint=os.environ["AZURE_OPENAI_ENDPOINT"],
         api_version=os.environ.get(
-            "AZURE_OPENAI_API_VERSION", "2024-06-01"
+            "AZURE_OPENAI_API_VERSION", "2025-01-01-preview"
         ),
     )
     prompt = _build_user_prompt(question, section, context)
