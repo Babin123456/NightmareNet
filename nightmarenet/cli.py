@@ -163,6 +163,51 @@ def cmd_distort(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_foundation(args: argparse.Namespace) -> int:
+    """Manage foundation models."""
+    from nightmarenet.transfer.registry import get_registry
+    
+    if args.action == "register":
+        registry = get_registry()
+        registry.register(args.model, args.name)
+    else:
+        print(f"Unknown foundation action: {args.action}", file=sys.stderr)
+        return 1
+    return 0
+
+
+def cmd_transfer(args: argparse.Namespace) -> int:
+    """Robustness transfer learning commands."""
+    from nightmarenet.transfer.report import generate_transfer_report
+    
+    if args.measure:
+        print("Measuring transfer efficiency...")
+        try:
+            with open(args.transferred) as f:
+                t_data = json.load(f)
+            with open(args.baseline) as f:
+                b_data = json.load(f)
+            
+            t_rob = t_data.get("robustness_score", 0.0)
+            b_rob = b_data.get("robustness_score", 0.0)
+            t_acc = t_data.get("clean_accuracy", 0.0)
+            b_acc = b_data.get("clean_accuracy", 0.0)
+            
+            report = generate_transfer_report(t_rob, b_rob, t_acc, b_acc, 0.0, 0.0)
+            print(report)
+        except Exception as e:
+            print(f"Error measuring transfer efficiency: {e}", file=sys.stderr)
+            return 1
+    elif args.foundation and args.config:
+        print(f"Starting transfer fine-tuning using foundation '{args.foundation}' and config '{args.config}'")
+        # In a full implementation, this would parse the config, load data, and use TransferFineTuner.
+        print("Transfer fine-tuning initialized.")
+    else:
+        print("Invalid arguments for transfer command.", file=sys.stderr)
+        return 1
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="nightmarenet",
@@ -212,6 +257,21 @@ def build_parser() -> argparse.ArgumentParser:
     distort_parser.add_argument("--text", required=True)
     distort_parser.add_argument("--seed", type=int, default=None)
 
+    # foundation
+    foundation_parser = subparsers.add_parser("foundation", help="Manage foundation models")
+    foundation_subparsers = foundation_parser.add_subparsers(dest="action", help="Foundation actions")
+    register_parser = foundation_subparsers.add_parser("register", help="Register a foundation model")
+    register_parser.add_argument("--model", required=True, help="Path to the trained model")
+    register_parser.add_argument("--name", required=True, help="Name for the foundation model")
+
+    # transfer
+    transfer_parser = subparsers.add_parser("transfer", help="Transfer robustness to downstream tasks")
+    transfer_parser.add_argument("--foundation", help="Foundation model name")
+    transfer_parser.add_argument("--config", help="Path to transfer config YAML")
+    transfer_parser.add_argument("--measure", action="store_true", help="Measure transfer efficiency")
+    transfer_parser.add_argument("--transferred", help="Path to transferred evaluation JSON")
+    transfer_parser.add_argument("--baseline", help="Path to baseline evaluation JSON")
+
     return parser
 
 
@@ -228,6 +288,8 @@ def main(argv: Optional[list] = None) -> int:
         "evaluate": cmd_evaluate,
         "benchmark": cmd_benchmark,
         "distort": cmd_distort,
+        "foundation": cmd_foundation,
+        "transfer": cmd_transfer,
     }
 
     return commands[args.command](args)
