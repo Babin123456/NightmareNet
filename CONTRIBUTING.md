@@ -366,6 +366,8 @@ Good documentation is as important as good code. If you're unsure what to update
 
 ## 6. PR checklist
 
+> **CI runs `ruff check .` on every PR and will block merge if there are lint errors.** Run it locally before pushing to avoid failed checks.
+
 Before requesting review, confirm every box.
 
 - [ ] I have **starred the repo** and **followed [@Adit-Jain-srm](https://github.com/Adit-Jain-srm)**.
