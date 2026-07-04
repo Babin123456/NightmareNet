@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import urllib.error
 from unittest.mock import MagicMock, patch
 
 from fastapi.testclient import TestClient
@@ -194,9 +195,6 @@ def test_test_webhook_endpoint(mock_urlopen):
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
     assert mock_urlopen.call_count == 1
-
-
-import urllib.error
 
 
 @patch("urllib.request.urlopen")

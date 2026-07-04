@@ -132,7 +132,7 @@ def _send_webhook_request(url: str, event_type: str, message: str, details: Dict
         data=data,
         headers={"Content-Type": "application/json", "User-Agent": "NightmareNet-Webhook/0.2.0"},
     )
-    
+
     max_retries = 1
     for attempt in range(max_retries + 1):
         try:
