@@ -366,7 +366,7 @@ If you use NightmareNet in academic work, please cite:
 ## Testing
 
 ```bash
-pytest tests/ -v --tb=short          # 288+ tests
+pytest --cov=nightmarenet --cov-report=term-missing tests/ -v --tb=short   # 502+ tests
 ruff check .                         # zero lint errors
 mypy nightmarenet/                   # type check
 cd frontend && npm run build         # production build

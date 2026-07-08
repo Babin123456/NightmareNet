@@ -209,7 +209,7 @@ pre-commit run --all-files
 ### Verify the environment
 
 ```bash
-pytest tests/ -v --tb=short          # 288+ tests, all should pass
+pytest --cov=nightmarenet --cov-report=term-missing tests/ -v --tb=short   # 502+ tests, all should pass
 ruff check .                         # zero errors expected
 mypy nightmarenet/                   # type-check the OSS core
 ```
@@ -374,7 +374,7 @@ Good documentation is as important as good code. If you're unsure what to update
 Before requesting review, confirm every box.
 
 - [ ] I have **starred the repo** and **followed [@Adit-Jain-srm](https://github.com/Adit-Jain-srm)**.
-- [ ] `pytest tests/ -v --tb=short` — green locally.
+- [ ] `pytest --cov=nightmarenet tests/ -v --tb=short` — green locally.
 - [ ] `ruff check .` — zero errors.
 - [ ] `mypy nightmarenet/` — no new errors.
 - [ ] If frontend changed: `cd frontend && npm run build` succeeds.
