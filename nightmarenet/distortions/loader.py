@@ -8,7 +8,7 @@ import importlib.util
 import logging
 import sys
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Optional
 
 from nightmarenet.distortions.registry import DistortionFn
 
@@ -21,7 +21,7 @@ def load_from_file(
     registry,
 ) -> Optional[DistortionFn]:
     """Load a distortion function from a Python file.
-    
+
     Args:
         file_path: Path to the Python file containing the distortion function
         function_name: Name of the function to load from the file
@@ -73,7 +73,7 @@ def load_custom_engine(
     registry,
 ) -> Optional[str]:
     """Load a custom engine from a 'custom:' reference.
-    
+
     Args:
         engine_ref: Reference in format 'custom:path/to/file.py:function_name'
         registry: DistortionRegistry instance to register the loaded function

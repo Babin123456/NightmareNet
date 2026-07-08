@@ -1,13 +1,18 @@
 """Tests for distortion plugin system (validators, loader, testing)."""
 
-import pytest
 from pathlib import Path
 
 from nightmarenet.distortions.base import BaseDistortion
-from nightmarenet.distortions.loader import load_from_file, load_custom_engine
+from nightmarenet.distortions.loader import load_custom_engine, load_from_file
 from nightmarenet.distortions.registry import DistortionRegistry
-from nightmarenet.distortions.testing import validate_distortion_function, validate_distortion_plugin
-from nightmarenet.distortions.validators import validate_distortion_contract, validate_base_distortion
+from nightmarenet.distortions.testing import (
+    validate_distortion_function,
+    validate_distortion_plugin,
+)
+from nightmarenet.distortions.validators import (
+    validate_base_distortion,
+    validate_distortion_contract,
+)
 
 
 def test_validate_distortion_contract_valid() -> None:
@@ -126,7 +131,7 @@ def test_load_from_file_not_python(tmp_path: Path) -> None:
     registry = DistortionRegistry()
     txt_file = tmp_path / "test.txt"
     txt_file.write_text("not python")
-    
+
     result = load_from_file(str(txt_file), "some_func", registry)
     assert result is None
 
@@ -136,7 +141,7 @@ def test_load_from_file_function_not_found(tmp_path: Path) -> None:
     registry = DistortionRegistry()
     py_file = tmp_path / "test.py"
     py_file.write_text("def other_func(): pass")
-    
+
     result = load_from_file(str(py_file), "missing_func", registry)
     assert result is None
 
@@ -149,7 +154,7 @@ def test_load_from_file_success(tmp_path: Path) -> None:
 def my_distort(text: str, strength: float, seed: int = None) -> str:
     return text.upper()
 """)
-    
+
     result = load_from_file(str(py_file), "my_distort", registry)
     assert result is not None
     assert result("hello", 0.5) == "HELLO"
@@ -177,7 +182,7 @@ def test_load_custom_engine_success(tmp_path: Path) -> None:
 def custom_distort(text: str, strength: float, seed: int = None) -> str:
     return text[::-1]
 """)
-    
+
     result = load_custom_engine(f"custom:{py_file}:custom_distort", registry)
     assert result is not None
     assert result in registry

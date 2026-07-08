@@ -66,15 +66,17 @@ class DreamDatasetGenerator:
             for engine_config in custom_engines:
                 engine_name = engine_config.get("engine")
                 engine_strength = engine_config.get("strength", self.strength)
-                
+
                 # Handle custom: prefix for file-based engines
                 if engine_name and engine_name.startswith("custom:"):
                     loaded_name = load_custom_engine(engine_name, registry)
                     if loaded_name:
                         engine_name = loaded_name
-                
+
                 if engine_name and engine_name in registry:
-                    result = registry.apply(engine_name, result, strength=engine_strength, seed=self.seed)
+                    result = registry.apply(
+                        engine_name, result, strength=engine_strength, seed=self.seed
+                    )
 
         # Apply text-level corruptions (primary for dream phase)
         text_config = self.config.get("text", None)
@@ -205,15 +207,17 @@ class NightmareDatasetGenerator:
             for engine_config in custom_engines:
                 engine_name = engine_config.get("engine")
                 engine_strength = engine_config.get("strength", self.strength)
-                
+
                 # Handle custom: prefix for file-based engines
                 if engine_name and engine_name.startswith("custom:"):
                     loaded_name = load_custom_engine(engine_name, registry)
                     if loaded_name:
                         engine_name = loaded_name
-                
+
                 if engine_name and engine_name in registry:
-                    result = registry.apply(engine_name, result, strength=engine_strength, seed=self.seed)
+                    result = registry.apply(
+                        engine_name, result, strength=engine_strength, seed=self.seed
+                    )
 
         # Apply aggressive text-level corruptions
         text_config = self.config.get("text", None)

@@ -5,7 +5,7 @@ behavior and interface requirements.
 """
 
 import logging
-from typing import Any, List, Optional
+from typing import Any, List
 
 from nightmarenet.distortions.base import BaseDistortion
 
@@ -17,21 +17,21 @@ def validate_distortion_contract(
     text: str = "The quick brown fox jumps over the lazy dog.",
 ) -> List[str]:
     """Validate that a distortion function meets the contract.
-    
+
     Args:
         fn: The distortion function to validate
         text: Sample text for testing (default: standard pangram)
-        
+
     Returns:
         List of validation failure messages (empty if valid)
     """
     failures = []
-    
+
     # Check callable
     if not callable(fn):
         failures.append("Function is not callable")
         return failures
-    
+
     # Test empty input
     try:
         result = fn("", strength=0.5, seed=42)
@@ -79,15 +79,15 @@ def validate_distortion_contract(
 
 def validate_base_distortion(engine_cls: type) -> List[str]:
     """Validate a BaseDistortion subclass implementation.
-    
+
     Args:
         engine_cls: The BaseDistortion subclass to validate
-        
+
     Returns:
         List of validation failure messages (empty if valid)
     """
     failures = []
-    
+
     # Check inheritance
     if not issubclass(engine_cls, BaseDistortion):
         failures.append("Class must inherit from BaseDistortion")
@@ -102,13 +102,13 @@ def validate_base_distortion(engine_cls: type) -> List[str]:
 
     if not hasattr(instance, 'name') or not instance.name:
         failures.append("Class must have a non-empty 'name' attribute")
-    
+
     if not hasattr(instance, 'phase'):
         failures.append("Class must have a 'phase' attribute")
-    
+
     if not hasattr(instance, 'description'):
         failures.append("Class must have a 'description' attribute")
-    
+
     # Check distort method
     if not hasattr(instance, 'distort') or not callable(instance.distort):
         failures.append("Class must have a callable 'distort' method")
@@ -116,11 +116,11 @@ def validate_base_distortion(engine_cls: type) -> List[str]:
         # Validate the distort method contract
         method_failures = validate_distortion_contract(instance.distort)
         failures.extend(method_failures)
-    
+
     # Check validate method
     if not hasattr(instance, 'validate') or not callable(instance.validate):
         failures.append("Class must have a callable 'validate' method")
-    
+
     return failures
 
 
@@ -128,18 +128,18 @@ def validate_plugin_package(
     package_name: str,
 ) -> List[str]:
     """Validate a plugin package structure.
-    
+
     Args:
         package_name: Name of the installed package to validate
-        
+
     Returns:
         List of validation failure messages (empty if valid)
     """
     failures = []
-    
+
     try:
         import importlib.metadata
-        metadata = importlib.metadata.metadata(package_name)
+        importlib.metadata.metadata(package_name)
     except Exception as e:
         failures.append(f"Failed to load package metadata: {e}")
         return failures
@@ -147,10 +147,14 @@ def validate_plugin_package(
     # Check for entry points
     try:
         eps = importlib.metadata.entry_points(group="nightmarenet.distortions")
-        package_eps = [ep for ep in eps if hasattr(ep, 'dist') and ep.dist and ep.dist.name == package_name]
-        
+        package_eps = [
+            ep
+            for ep in eps
+            if hasattr(ep, 'dist') and ep.dist and ep.dist.name == package_name
+        ]
+
         if not package_eps:
-            failures.append(f"No entry points found in 'nightmarenet.distortions' group")
+            failures.append("No entry points found in 'nightmarenet.distortions' group")
     except Exception as e:
         failures.append(f"Failed to check entry points: {e}")
 

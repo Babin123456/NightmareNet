@@ -47,12 +47,20 @@ class DistortionRegistry:
         self.register(
             "dream",
             dream_mod.distort,
-            metadata={"phase": "dream", "description": "Mild stochastic augmentation", "source": "builtin"},
+            metadata={
+                "phase": "dream",
+                "description": "Mild stochastic augmentation",
+                "source": "builtin",
+            },
         )
         self.register(
             "nightmare",
             nightmare_mod.distort,
-            metadata={"phase": "nightmare", "description": "Adversarial perturbation", "source": "builtin"},
+            metadata={
+                "phase": "nightmare",
+                "description": "Adversarial perturbation",
+                "source": "builtin",
+            },
         )
 
     def _discover_plugins(self) -> None:
@@ -133,9 +141,11 @@ class DistortionRegistry:
         description: str = "",
     ):
         """Decorator for registering distortion functions.
-        
+
         Usage:
-            @registry.register_decorator('my_distortion', phase='nightmare', description='My custom distortion')
+            @registry.register_decorator(
+                'my_distortion', phase='nightmare', description='My custom distortion'
+            )
             def my_distortion(text: str, strength: float, seed: int = None) -> str:
                 return text
         """

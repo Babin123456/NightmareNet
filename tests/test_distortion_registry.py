@@ -104,6 +104,6 @@ def test_base_distortion_plugin() -> None:
 
 def test_builtin_metadata_source() -> None:
     registry = DistortionRegistry()
-    
+
     assert registry._metadata["dream"]["source"] == "builtin"
     assert registry._metadata["nightmare"]["source"] == "builtin"

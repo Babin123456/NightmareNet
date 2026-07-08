@@ -270,26 +270,35 @@ def cmd_distort(args: argparse.Namespace) -> int:
     # Handle --list-engines
     if getattr(args, "list_engines", False):
         engines_by_source = registry.list_engines_by_source()
-        
+
         print("Available distortion engines:")
-        
+
         if engines_by_source.get("builtin"):
             print("\nBuilt-in:")
             for engine in engines_by_source["builtin"]:
                 pkg_info = f" [{engine.get('package', '')}]" if engine.get("package") else ""
-                print(f"  {engine['name']} ({engine.get('phase', 'unknown')}){pkg_info} - {engine.get('description', '')}")
-        
+                print(
+                    f"  {engine['name']} ({engine.get('phase', 'unknown')}){pkg_info} "
+                    f"- {engine.get('description', '')}"
+                )
+
         if engines_by_source.get("plugin"):
             print("\nPlugins:")
             for engine in engines_by_source["plugin"]:
                 pkg_info = f" [{engine.get('package', '')}]" if engine.get("package") else ""
-                print(f"  {engine['name']} ({engine.get('phase', 'unknown')}){pkg_info} - {engine.get('description', '')}")
-        
+                print(
+                    f"  {engine['name']} ({engine.get('phase', 'unknown')}){pkg_info} "
+                    f"- {engine.get('description', '')}"
+                )
+
         if engines_by_source.get("custom"):
             print("\nCustom:")
             for engine in engines_by_source["custom"]:
-                print(f"  {engine['name']} ({engine.get('phase', 'unknown')}) - {engine.get('description', '')}")
-        
+                print(
+                    f"  {engine['name']} ({engine.get('phase', 'unknown')}) "
+                    f"- {engine.get('description', '')}"
+                )
+
         return 0
 
     # Apply distortion
@@ -299,12 +308,15 @@ def cmd_distort(args: argparse.Namespace) -> int:
             print(f"Error: unknown engine '{args.engine}'", file=sys.stderr)
             print(f"Available: {', '.join(registry.engine_names)}", file=sys.stderr)
             return 1
-        
+
         result = registry.apply(args.engine, text, strength=strength, seed=args.seed)
         engine_meta = registry._metadata.get(args.engine, {})
         print(f"Original:  {text}")
         print(f"Distorted: {result}")
-        print(f"  Engine: {args.engine}, Phase: {engine_meta.get('phase', 'unknown')}, Strength: {strength}")
+        print(
+            f"  Engine: {args.engine}, Phase: {engine_meta.get('phase', 'unknown')}, "
+            f"Strength: {strength}"
+        )
     else:
         # Legacy behavior for backward compatibility
         from nightmarenet.distortions import dream, nightmare
@@ -320,7 +332,7 @@ def cmd_distort(args: argparse.Namespace) -> int:
         print(f"Original:  {text}")
         print(f"Distorted: {result}")
         print(f"  Type: {args.type}, Strength: {strength}")
-    
+
     return 0
 
 
@@ -503,9 +515,17 @@ def build_parser() -> argparse.ArgumentParser:
 
     # distort
     distort_parser = subparsers.add_parser("distort", help="Apply distortion to text")
-    distort_parser.add_argument("--type", choices=["dream", "nightmare"], help="Legacy distortion type (use --engine instead)")
-    distort_parser.add_argument("--engine", help="Distortion engine name (use --list-engines to see available)")
-    distort_parser.add_argument("--list-engines", action="store_true", help="List all available distortion engines")
+    distort_parser.add_argument(
+        "--type",
+        choices=["dream", "nightmare"],
+        help="Legacy distortion type (use --engine instead)",
+    )
+    distort_parser.add_argument(
+        "--engine", help="Distortion engine name (use --list-engines to see available)"
+    )
+    distort_parser.add_argument(
+        "--list-engines", action="store_true", help="List all available distortion engines"
+    )
     distort_parser.add_argument("--strength", type=float, default=0.3)
     distort_parser.add_argument("--text", required=True)
     distort_parser.add_argument("--seed", type=int, default=None)
