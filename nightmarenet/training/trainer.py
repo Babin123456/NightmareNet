@@ -101,7 +101,29 @@ def _tokenize_dataset(
     tokenized.set_format("torch")
     return DataLoader(tokenized, batch_size=batch_size, shuffle=True)
 
-
+def seed_worker(worker_id):
+    import random
+    import numpy as np
+    worker_seed = torch.initial_seed() % 2**32
+    np.random.seed(worker_seed)
+    random.seed(worker_seed)
+    
+def _set_reproducibility(seed: int) -> None:
+    """Set seeds across Python, NumPy, and PyTorch for full reproducibility."""
+    import random
+    import numpy as np
+    
+    logger.info("Setting reproducibility seed: %d", seed)
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+        
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    
 class Trainer:
     """Orchestrates the full sleep-cycle training pipeline.
 
@@ -363,6 +385,11 @@ class Trainer:
         Returns:
             List of phase result dicts (training history).
         """
+
+        ## Set the reproducibility seed before training starts (Fixes Issue #64)
+        seed = self.training_config.get("seed", 42)
+        _set_reproducibility(seed)
+
         logger.info("Starting training with schedule:\n%s", self.scheduler.summary())  # type: ignore[union-attr]
         logger.info("Device: %s", self.device)
         self.tracker.log_config(self.config)
