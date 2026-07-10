@@ -8,9 +8,9 @@ Thank you for helping improve NightmareNet. This project uses a **research-first
 
 > **Please complete these steps before opening a Pull Request:**
 
-1. **Star this repository** — It helps us gauge community interest and prioritize features.
-2. **Follow [@Adit-Jain-srm](https://github.com/Adit-Jain-srm)** — Stay updated on releases, related projects, and research.
-3. **Read this entire guide** — PRs that don't follow the coding standards or skip tests will be asked to revise.
+1. **Star this repository** ΓÇö It helps us gauge community interest and prioritize features.
+2. **Follow [@Adit-Jain-srm](https://github.com/Adit-Jain-srm)** ΓÇö Stay updated on releases, related projects, and research.
+3. **Read this entire guide** ΓÇö PRs that don't follow the coding standards or skip tests will be asked to revise.
 4.  **Please read our [Code of Conduct](CODE_OF_CONDUCT.md)** before contributing to help maintain a welcoming and respectful community.
 > Maintainers verify star/follow status before merging. PRs from accounts that haven't completed steps 1-2 will be asked to do so before review begins.
 
@@ -129,7 +129,7 @@ If two people request the same issue simultaneously (within 1 hour):
 - Small PRs merge faster than large ones - if an issue is big, ask if it can be split into sub-issues
 - If you're stuck, comment on the issue asking for help - don't go silent for a week
 - **We merge quickly.** Focus on completing your current assigned issue before requesting new ones. Deliver first, then pick up more.
-- **Think you can do it better?** If an issue is assigned but has no PR or progress after a few days, feel free to comment with your approach. Quality implementations are always welcome - we'd rather merge the best solution regardless of who was "first."
+- **Think you can do it better?** Don't be discouraged by an existing assignment. If you believe you can deliver a better or faster implementation, comment with your detailed approach - even if someone else already requested the issue. We evaluate approaches on merit, not arrival order. Include: which files you'll change, what enhancements you'd add beyond the stated requirements, and your timeline. If your plan is demonstrably stronger (more complete, better tested, or addresses edge cases the current assignee missed), we'll reassign. The goal is the best possible contribution, not a queue.
 - All assignment decisions are at the maintainer's discretion based on these guidelines. The goal is shipping great code, not bureaucracy.
 
 ---
@@ -138,19 +138,19 @@ If two people request the same issue simultaneously (within 1 hour):
 
 We value **modularity, clarity, and maintainability** over cleverness. Every contribution should:
 
-- **Single responsibility** — One function does one thing. One module owns one concern.
-- **Small, focused files** — If a file exceeds 400 lines, consider splitting.
-- **Explicit over implicit** — Prefer clear parameter names, type hints, and docstrings over magic.
-- **No god objects** — Don't make a class that does everything. Compose small, testable units.
-- **Fail fast, fail loud** — Validate inputs early. Raise descriptive errors with context.
+- **Single responsibility** ΓÇö One function does one thing. One module owns one concern.
+- **Small, focused files** ΓÇö If a file exceeds 400 lines, consider splitting.
+- **Explicit over implicit** ΓÇö Prefer clear parameter names, type hints, and docstrings over magic.
+- **No god objects** ΓÇö Don't make a class that does everything. Compose small, testable units.
+- **Fail fast, fail loud** ΓÇö Validate inputs early. Raise descriptive errors with context.
 
 ### AI-Generated Code Disclosure
 
 If your contribution includes **AI-generated code** (Copilot, ChatGPT, Claude, Cursor, etc.), you must:
 
 1. **Disclose it** in the PR description: "This PR includes AI-assisted code generation."
-2. **Review every line** — You are responsible for correctness, not the AI. AI-generated code with obvious bugs or hallucinated APIs will be rejected.
-3. **Understand what it does** — Be prepared to explain any code in your PR during review.
+2. **Review every line** ΓÇö You are responsible for correctness, not the AI. AI-generated code with obvious bugs or hallucinated APIs will be rejected.
+3. **Understand what it does** ΓÇö Be prepared to explain any code in your PR during review.
 
 We welcome AI-assisted contributions. We reject blindly pasted AI output.
 
@@ -161,7 +161,7 @@ Any PR that changes the frontend must include:
 - **Before/after screenshots** (or a short screen recording) in the PR description
 - **Mobile viewport** screenshot (375px width) if the change affects layout
 - **Dark + light mode** screenshots if the change affects colors/theming
-- **Accessibility check** — describe how keyboard navigation and screen readers interact with your change
+- **Accessibility check** ΓÇö describe how keyboard navigation and screen readers interact with your change
 
 ---
 
@@ -251,19 +251,19 @@ NightmareNet has a strict OSS / hosted boundary. Treat it as a hard constraint w
 
 ### Key entry points
 
-- `nightmarenet.pipeline.Pipeline` — orchestrator for the 4-phase cycle
-- `nightmarenet.cli.main` — the `nightmarenet` console entry point
-- `nightmarenet.distortions.registry.get_registry` — the lazy-singleton plugin registry
-- `nightmarenet.evaluation.evaluator.Evaluator` — multi-strength robustness scoring
-- `nightmarenet.api.app` — FastAPI app exposing the OSS HTTP surface
+- `nightmarenet.pipeline.Pipeline` ΓÇö orchestrator for the 4-phase cycle
+- `nightmarenet.cli.main` ΓÇö the `nightmarenet` console entry point
+- `nightmarenet.distortions.registry.get_registry` ΓÇö the lazy-singleton plugin registry
+- `nightmarenet.evaluation.evaluator.Evaluator` ΓÇö multi-strength robustness scoring
+- `nightmarenet.api.app` ΓÇö FastAPI app exposing the OSS HTTP surface
 
 ### Documentation map
 
-- [`docs/architecture/PRD.md`](docs/architecture/PRD.md) — product requirements, personas, success metrics, requirements traceability
-- [`docs/architecture/TRD.md`](docs/architecture/TRD.md) — technical requirements
-- [Interactive API docs](http://localhost:8000/docs) (auto-generated by FastAPI) — OpenAPI spec for the OSS HTTP surface
-- [`docs/research/paper-draft.md`](docs/research/paper-draft.md) — academic paper draft (cite this in PRs that touch the algorithm)
-- [`docs/research/benchmark-v1.md`](docs/research/benchmark-v1.md) — reproducible benchmark methodology
+- [`docs/architecture/PRD.md`](docs/architecture/PRD.md) ΓÇö product requirements, personas, success metrics, requirements traceability
+- [`docs/architecture/TRD.md`](docs/architecture/TRD.md) ΓÇö technical requirements
+- [Interactive API docs](http://localhost:8000/docs) (auto-generated by FastAPI) ΓÇö OpenAPI spec for the OSS HTTP surface
+- [`docs/research/paper-draft.md`](docs/research/paper-draft.md) ΓÇö academic paper draft (cite this in PRs that touch the algorithm)
+- [`docs/research/benchmark-v1.md`](docs/research/benchmark-v1.md) ΓÇö reproducible benchmark methodology
 
 ---
 
@@ -305,11 +305,11 @@ def homoglyph(text, strength, seed=None):
 
 Mirror the package layout under `tests/`. At minimum:
 
-1. **Determinism** — same `(text, strength, seed)` produces the same output across runs.
+1. **Determinism** ΓÇö same `(text, strength, seed)` produces the same output across runs.
 2. **Strength 0** is approximately a no-op.
 3. **Strength 1** produces a measurable change.
 4. **Empty input** returns empty without raising.
-5. **Registry round-trip** — `get_registry().apply('your_engine', ...)` returns the same string as calling the function directly.
+5. **Registry round-trip** ΓÇö `get_registry().apply('your_engine', ...)` returns the same string as calling the function directly.
 
 ### Documentation
 
@@ -326,7 +326,7 @@ Mirror the package layout under `tests/`. At minimum:
 - **Ruff rules:** `E, F, W, I, N, UP, B`. We ignore `UP007` and `UP045` to keep `Union[X, Y]` available in 3.9-targeted code.
 - **Imports:** isort via ruff. Order: stdlib, third-party, local; alphabetical within each group.
 - **Type hints:**
-  - Use `Union[X, Y]` and `Optional[X]` — **not** `X | Y` — in any code path that runs on Python 3.9.
+  - Use `Union[X, Y]` and `Optional[X]` ΓÇö **not** `X | Y` ΓÇö in any code path that runs on Python 3.9.
   - Use `from __future__ import annotations` everywhere **except** modules under `nightmarenet/api/` that use FastAPI `Body(...)`. The future import breaks Pydantic v2 at runtime there. Prefer module-level singletons for `Body(...)` defaults to satisfy `B008`.
 - **Docstrings:** Google style on public APIs only. Internal helpers can be terse.
 - **Errors:** raise with context (`raise X("...") from e`); never bare `raise X`.
@@ -336,7 +336,7 @@ Mirror the package layout under `tests/`. At minimum:
 ### Frontend
 
 - TypeScript only. No `any` in committed code.
-- Tailwind v4 — theme lives in the `@theme inline` block, not a `tailwind.config.js`.
+- Tailwind v4 ΓÇö theme lives in the `@theme inline` block, not a `tailwind.config.js`.
 - Animations via Framer Motion; respect `prefers-reduced-motion`.
 - Keep client bundles lean; lazy-load heavy charts where possible.
 
@@ -362,12 +362,12 @@ Mirror the package layout under `tests/`. At minimum:
 
 All PRs that change user-facing behavior **must** update relevant documentation:
 
-- **API changes** → Update `docs/api/` OpenAPI spec and relevant endpoint docs
-- **New features** → Add to `README.md` feature table + relevant section
-- **Config changes** → Update `configs/default.yaml` comments + `CLAUDE.md` if applicable
-- **Distortion changes** → Update the README distortion table + `docs/research/paper-draft.md`
-- **Frontend changes** → Update component inventory in README if adding panels
-- **Breaking changes** → Add migration note at the top of PR description
+- **API changes** ΓåÆ Update `docs/api/` OpenAPI spec and relevant endpoint docs
+- **New features** ΓåÆ Add to `README.md` feature table + relevant section
+- **Config changes** ΓåÆ Update `configs/default.yaml` comments + `CLAUDE.md` if applicable
+- **Distortion changes** ΓåÆ Update the README distortion table + `docs/research/paper-draft.md`
+- **Frontend changes** ΓåÆ Update component inventory in README if adding panels
+- **Breaking changes** ΓåÆ Add migration note at the top of PR description
 
 Good documentation is as important as good code. If you're unsure what to update, ask in the PR description and we'll guide you.
 
@@ -380,9 +380,9 @@ Good documentation is as important as good code. If you're unsure what to update
 Before requesting review, confirm every box.
 
 - [ ] I have **starred the repo** and **followed [@Adit-Jain-srm](https://github.com/Adit-Jain-srm)**.
-- [ ] `pytest --cov=nightmarenet tests/ -v --tb=short` — green locally.
-- [ ] `ruff check .` — zero errors.
-- [ ] `mypy nightmarenet/` — no new errors.
+- [ ] `pytest --cov=nightmarenet tests/ -v --tb=short` ΓÇö green locally.
+- [ ] `ruff check .` ΓÇö zero errors.
+- [ ] `mypy nightmarenet/` ΓÇö no new errors.
 - [ ] If frontend changed: `cd frontend && npm run build` succeeds.
 - [ ] No `from __future__ import annotations` added under `nightmarenet/api/`.
 - [ ] No new `nightmarenet/` import of a hosted-only library (`sqlalchemy`, `redis`, `celery`, `psycopg2`, `stripe`).
@@ -463,12 +463,12 @@ These are applied by maintainers at merge time based on quality. **Do not reques
 
 ## Where to ask for help
 
-- **GitHub Discussions** — `https://github.com/Adit-Jain-srm/NightmareNet/discussions`
+- **GitHub Discussions** ΓÇö `https://github.com/Adit-Jain-srm/NightmareNet/discussions`
   - `q-and-a` for "how do I..." questions
   - `ideas` for feature proposals (RFC threads welcome)
   - `research` for paper-related discussion, benchmark proposals, citation requests
-- **GitHub Issues** — bug reports and concrete tasks
-- **Direct contact** — for security disclosures, email the maintainers per [`SECURITY.md`](SECURITY.md). Do **not** open public issues for vulnerabilities.
+- **GitHub Issues** ΓÇö bug reports and concrete tasks
+- **Direct contact** ΓÇö for security disclosures, email the maintainers per [`SECURITY.md`](SECURITY.md). Do **not** open public issues for vulnerabilities.
 
 We respond fastest to issues that include a minimal reproducible example, the relevant config snippet, and the output of `pip list | findstr nightmarenet` (or `pip freeze | grep nightmarenet` on Unix).
 
