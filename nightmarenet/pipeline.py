@@ -805,23 +805,37 @@ class Pipeline:
                 tracking_cfg = self.config.get("tracking", {})
                 auto_push_repo = tracking_cfg.get("auto_push_hub")
                 if auto_push_repo:
+                    import os
                     import tempfile
+
+                    import yaml
 
                     from nightmarenet.hub.core import push_model
 
-                    logger.info(
-                        "Automated post-training synchronization triggered for hub: %s",
-                        auto_push_repo
-                    )
+                    logger.info("Pushing to Hub...")
                     try:
                         with tempfile.TemporaryDirectory() as tmp_dir:
                             self.export(tmp_dir)
-                            push_model(model_dir=tmp_dir, repo_id=auto_push_repo)
+
+                            # Extract metadata from comparison results and configuration
+                            pipeline_metadata = {
+                                "robustness_score": float(comparison.get("robustness_score", 0.0)),
+                                "training_config": self.config
+                            }
+
+                            # Save the metadata temporarily inside the exported directory
+                            metadata_file_path = os.path.join(tmp_dir, "hub_metadata.yaml")
+                            with open(metadata_file_path, "w", encoding="utf-8") as f:
+                                yaml.safe_dump(pipeline_metadata, f)
+
+                            # Pass the generated metadata file to push_model
+                            push_model(
+                                model_dir=tmp_dir,
+                                repo_id=auto_push_repo,
+                                metadata_path=metadata_file_path
+                            )
                     except Exception as upload_err:
-                        logger.error(
-                            "Automated HuggingFace Hub push sequence failed: %s",
-                            upload_err
-                        )
+                        logger.error("Push failed: %s", upload_err)
 
                 return comparison
             except Exception as exc:

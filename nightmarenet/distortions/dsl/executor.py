@@ -87,17 +87,10 @@ class ChainExecutor:
                 raise ValueError("Condition must have exactly one comparison")
 
             comparator = node.comparators[0]
-            valid_types = (ast.Constant, ast.Num) if hasattr(ast, "Num") else (ast.Constant,)
-            # 1. Ensure it is a valid literal type
-            if not isinstance(comparator, valid_types):
+            if not isinstance(comparator, (ast.Constant, ast.Num)):
+                # ast.Num is for Python < 3.8, ast.Constant >= 3.8
                 raise ValueError("Condition must compare with a numeric literal")
-            # 2. Block 'None' literals explicitly if it's an ast.Constant
-            if isinstance(comparator, ast.Constant) and comparator.value is None:
-                raise ValueError("None literal is not allowed")
-            # 3. Block non-numeric constants (like strings or booleans)
-            if isinstance(comparator, ast.Constant):
-                if not isinstance(comparator.value, (int, float)):
-                    raise ValueError("Condition must compare with a numeric literal")
+
             # Validate the operator
             allowed_ops = {
                 ast.Gt: ">",
@@ -161,7 +154,7 @@ class ChainExecutor:
             if isinstance(node.value, (int, float)):
                 return float(node.value)
             raise ValueError("Only numeric literals are allowed")
-        elif hasattr(ast, "Num") and isinstance(node, ast.Num):  # Python < 3.8 compatibility
+        elif isinstance(node, ast.Num):  # Python < 3.8 compatibility
             if isinstance(node.n, (int, float)):
                 return float(node.n)
             raise ValueError(f"Unsupported numeric type in ast.Num: {type(node.n)}")
