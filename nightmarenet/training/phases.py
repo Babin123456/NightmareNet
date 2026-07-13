@@ -578,16 +578,19 @@ class CompressionPhase:
 
                 pruner = MagnitudePruner(pruning_ratio=pruning_ratio)
                 stats = pruner.apply(self.model)
+                pruning_succeeded = True
             except Exception as exc:
                 logger.error("Compression Phase - Failed to apply pruning: %s", exc)
                 stats = {"pruned_params": 0, "total_params": 0}
+                pruning_succeeded = False
         else:
             logger.warning("Unknown pruning method '%s'; skipping.", method)
             stats = {"pruned_params": 0, "total_params": 0}
+            pruning_succeeded = False
 
         # Distillation step (RSLAD-style): pruned student learns from teacher
         distillation_stats = {}
-        if teacher_model is not None:
+        if teacher_model is not None and pruning_succeeded:
             from nightmarenet.compression.distillation import run_distillation
 
             temperature = self.config.get("distillation_temperature", 4.0)

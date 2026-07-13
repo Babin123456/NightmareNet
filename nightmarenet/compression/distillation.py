@@ -27,6 +27,7 @@ def fgsm_perturb(model: nn.Module, batch: dict, epsilon: float = 0.01) -> dict:
     model.eval()
     input_ids = batch.get("input_ids")
     attention_mask = batch.get("attention_mask")
+    labels = batch.get("labels", input_ids)
 
     embedding_layer = model.get_input_embeddings()
     embeds = embedding_layer(input_ids).detach()
@@ -35,7 +36,7 @@ def fgsm_perturb(model: nn.Module, batch: dict, epsilon: float = 0.01) -> dict:
     outputs = model(
         inputs_embeds=embeds,
         attention_mask=attention_mask,
-        labels=input_ids,
+        labels=labels,
     )
     loss = outputs.loss
 
@@ -44,10 +45,9 @@ def fgsm_perturb(model: nn.Module, batch: dict, epsilon: float = 0.01) -> dict:
     (embeds_grad,) = torch.autograd.grad(loss, embeds)
     adv_embeds = (embeds + epsilon * embeds_grad.sign()).detach()
 
-    return {
-        "inputs_embeds": adv_embeds,
-        "attention_mask": attention_mask,
-    }
+    adv_dict = {k: v for k, v in batch.items() if k not in ("input_ids", "labels")}
+    adv_dict["inputs_embeds"] = adv_embeds
+    return adv_dict
 
 
 def run_distillation(
