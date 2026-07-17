@@ -29,7 +29,7 @@
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 [![CI](https://img.shields.io/badge/CI-passing-brightgreen)](.github/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/tests-558%2B%20passing-brightgreen)](#testing)
+[![Tests](https://img.shields.io/badge/tests-660%2B%20passing-brightgreen)](#testing)
 [![Python](https://img.shields.io/badge/python-3.9%E2%80%933.12-blue)](#installation)
 
 *Wake. Dream. Nightmare. Compress. Repeat.*
@@ -274,6 +274,38 @@ cd frontend && npm install && npm run dev    # http://localhost:3000
 
 ---
 
+## EU AI Act Compliance Reports
+
+NightmareNet can automatically generate compliance reports aligned with **EU AI Act Article 15** after a pipeline run.
+
+Enable the feature in your configuration:
+
+```yaml
+tracking:
+  compliance_report: true
+```
+
+When enabled, NightmareNet generates both:
+
+- JSON compliance report (machine-readable)
+- Markdown compliance report (human-readable)
+
+Each report includes:
+
+- Training lineage
+- Dataset and model metadata
+- Configuration SHA-256 hash
+- Model SHA-256 hash
+- Robustness metrics
+- Runtime environment
+- EU AI Act Article 15 mapping
+- NIST AI RMF mapping
+
+The API also exposes generated reports:
+
+- `GET /api/v1/compliance/report/{run_id}`
+- `GET /api/v1/compliance/reports`
+
 ## CLI Reference
 
 Four top-level commands cover the full workflow.
@@ -439,7 +471,7 @@ If you use NightmareNet in academic work, please cite:
 ## Testing
 
 ```bash
-pytest --cov=nightmarenet --cov-report=term-missing tests/ -v --tb=short   # 558+ tests
+pytest --cov=nightmarenet --cov-report=term-missing tests/ -v --tb=short   # 660+ tests
 pytest -m slow tests/test_distortion_fuzz.py -v                            # 1000+ sample fuzz suite
 ruff check .                         # zero lint errors
 mypy nightmarenet/                   # type check

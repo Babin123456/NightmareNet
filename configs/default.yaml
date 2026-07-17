@@ -22,7 +22,7 @@ training:
   num_cycles: 3
   auto_terminate: false          # Enable adaptive cycle termination
   convergence_threshold: 0.005   # Minimum robustness delta to continue training
-  convergence_patience: 2        # Consecutive non-improving cycles before stopping 
+  convergence_patience: 2        # Consecutive non-improving cycles before stopping
   batch_size: 8
   learning_rate: 5.0e-5
   nightmare_lr_multiplier: 2.0  # Higher LR for nightmare phase
@@ -116,6 +116,9 @@ tracking:
   log_dir: logs/runs
   output_dir: "results"
   output_format: "json"  # "json" or "markdown"
+
+  # Generate EU AI Act Article 15 compliance reports
+  compliance_report: false
   # Optional: Automatically push the best hardened model checkpoint to HuggingFace Hub
   # upon successful completion of the full Wake/Dream/Nightmare/Compress pipeline cycle.
   # Leave blank or omit to disable auto-push.
