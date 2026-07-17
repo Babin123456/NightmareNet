@@ -164,7 +164,9 @@ def test_ddp_wrapper_wrap_model(mock_torch, mock_dist):
 
     with mock.patch.dict(os.environ, {"LOCAL_RANK": "0"}):
         with mock.patch.object(model, "to", return_value=model):
-            with mock.patch("nightmarenet.distributed.ddp_wrapper.DistributedDataParallel") as mock_ddp:
+            with mock.patch(
+                "nightmarenet.distributed.ddp_wrapper.DistributedDataParallel"
+            ) as mock_ddp:
                 mock_ddp.return_value = "wrapped_model"
                 result = wrapper.wrap_model(model)
                 assert result == "wrapped_model"
@@ -347,11 +349,11 @@ def test_checkpoint_checksum_mismatch(tmp_path):
     checkpoint_dir = tmp_path / "checksum_mismatch"
     checkpoint_dir.mkdir()
     (checkpoint_dir / ".complete").write_text("complete")
-    
+
     # Create a model file
     model_file = checkpoint_dir / "model.pt"
     model_file.write_text("original content")
-    
+
     # Create metadata with wrong checksum
     metadata = {
         "version": "0.2.0",
@@ -442,11 +444,11 @@ def test_version_compatibility_invalid_format():
 def test_config_hash_determinism():
     """Test that config hash is deterministic across calls."""
     config = {"training": {"batch_size": 32, "lr": 0.001}, "model": {"layers": 3}}
-    
+
     hash1 = compute_config_hash(config)
     hash2 = compute_config_hash(config)
     hash3 = compute_config_hash(config)
-    
+
     assert hash1 == hash2 == hash3
 
 
@@ -454,10 +456,10 @@ def test_config_hash_order_independence():
     """Test that config hash is independent of key order."""
     config1 = {"a": 1, "b": 2, "c": 3}
     config2 = {"c": 3, "a": 1, "b": 2}
-    
+
     hash1 = compute_config_hash(config1)
     hash2 = compute_config_hash(config2)
-    
+
     assert hash1 == hash2
 
 
@@ -465,10 +467,10 @@ def test_config_hash_nested_order_independence():
     """Test that config hash is independent of nested key order."""
     config1 = {"outer": {"inner": {"x": 1, "y": 2}}}
     config2 = {"outer": {"inner": {"y": 2, "x": 1}}}
-    
+
     hash1 = compute_config_hash(config1)
     hash2 = compute_config_hash(config2)
-    
+
     assert hash1 == hash2
 
 
@@ -492,7 +494,10 @@ def test_device_pool_empty_override():
 
 def test_device_pool_no_cuda():
     """Test device pool when CUDA is not available."""
-    with mock.patch("nightmarenet.distributed.device_pool.torch.cuda.is_available", return_value=False):
+    with mock.patch(
+        "nightmarenet.distributed.device_pool.torch.cuda.is_available",
+        return_value=False,
+    ):
         pool = DevicePool()
         assert pool.available_devices == []
         assert pool.get_num_devices() == 0
@@ -501,12 +506,12 @@ def test_device_pool_no_cuda():
 def test_device_pool_memory_estimation():
     """Test memory requirement estimation."""
     pool = DevicePool()
-    
+
     # 1M parameters
     mem_1m = pool.estimate_memory_requirements(1_000_000)
     # 10M parameters
     mem_10m = pool.estimate_memory_requirements(10_000_000)
-    
+
     assert mem_10m > mem_1m
     assert mem_10m == mem_1m * 10
 
@@ -515,9 +520,9 @@ def test_device_pool_should_use_ddp():
     """Test DDP feasibility check."""
     pool_multi = DevicePool(override_devices=[0, 1])
     assert pool_multi.should_use_ddp() is True
-    
+
     pool_single = DevicePool(override_devices=[0])
     assert pool_single.should_use_ddp() is False
-    
+
     pool_empty = DevicePool(override_devices=[])
     assert pool_empty.should_use_ddp() is False
