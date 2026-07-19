@@ -712,6 +712,8 @@ def main(argv: Optional[list] = None) -> int:
         return 0
 
     # Set up logging based on verbosity flags
+    # Disable console logging for evaluate --json to avoid contaminating JSON output
+    json_mode = args.command == "evaluate" and getattr(args, "json", False)
     log_level = "INFO"
     if getattr(args, "verbose", False):
         log_level = "DEBUG"
@@ -720,7 +722,7 @@ def main(argv: Optional[list] = None) -> int:
 
     from nightmarenet.utils.logging_config import setup_logging
 
-    setup_logging(log_level=log_level, console=True, file_logging=False)
+    setup_logging(log_level=log_level, console=not json_mode, file_logging=False)
 
     commands = {
         "train": cmd_train,
