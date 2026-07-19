@@ -11,6 +11,12 @@ from fastapi.testclient import TestClient  # noqa: E402
 from nightmarenet.api.auth import APIKeyMiddleware  # noqa: E402
 
 
+@pytest.fixture(autouse=True)
+def clear_api_key_env(monkeypatch):
+    """Clear NIGHTMARENET_API_KEY before each test for isolation."""
+    monkeypatch.delenv("NIGHTMARENET_API_KEY", raising=False)
+
+
 class TestAPIKeyMiddleware:
     """Test APIKeyMiddleware behavior in isolation."""
 
@@ -224,8 +230,6 @@ class TestAPIKeyMiddleware:
         # Constructor key should not work when env var is set
         response = client.get("/protected", headers={"X-API-Key": "constructor-key"})
         assert response.status_code == 401
-
-        monkeypatch.delenv("NIGHTMARENET_API_KEY", raising=False)
 
     def test_non_exempt_referer_requires_auth(self):
         """Requests from non-exempt referers should require authentication."""
