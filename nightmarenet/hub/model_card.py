@@ -1,6 +1,8 @@
-import yaml
+import os
 import platform
-from typing import Any, Dict, Optional
+from typing import Any, Dict
+
+import yaml
 from huggingface_hub import ModelCard, ModelCardData
 
 DEFAULT_TEMPLATE = """
@@ -36,7 +38,7 @@ def generate_model_card(repo_id: str, metadata: Dict[str, Any]) -> str:
     """
     # Extract tags and metric for ModelCardData
     robustness_score = metadata.get("robustness_score", 0.0)
-    
+
 
     # Custom tags for nightmarenet
     custom_tags = {}
@@ -74,12 +76,11 @@ def generate_model_card(repo_id: str, metadata: Dict[str, Any]) -> str:
     # Try to extract template from config
     config = metadata.get("config", {})
     template_path = config.get("hub", {}).get("model_card_template", None)
-    
+
     # System info
     try:
         sys_info = platform.system() + " " + platform.release()
         processor = platform.processor()
-        import os
         cpu_cores = str(os.cpu_count())
         memory = "N/A"
     except Exception:
@@ -101,7 +102,7 @@ def generate_model_card(repo_id: str, metadata: Dict[str, Any]) -> str:
     }
 
     if template_path:
-        with open(template_path, "r", encoding="utf-8") as f:
+        with open(template_path, encoding="utf-8") as f:
             template_content = f.read()
     else:
         template_content = DEFAULT_TEMPLATE
@@ -111,5 +112,5 @@ def generate_model_card(repo_id: str, metadata: Dict[str, Any]) -> str:
         template_str=template_content,
         **kwargs
     )
-    
+
     return str(card)

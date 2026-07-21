@@ -5,11 +5,10 @@ from typing import Any, Dict, Optional
 
 import yaml
 
+from nightmarenet.hub.model_card import generate_model_card
 from nightmarenet.hub.utils import require_hf_hub
 
 logger = logging.getLogger(__name__)
-
-from nightmarenet.hub.model_card import generate_model_card
 
 @require_hf_hub
 def push_model(model_dir: str, repo_id: str, metadata_path: Optional[str] = None) -> None:
