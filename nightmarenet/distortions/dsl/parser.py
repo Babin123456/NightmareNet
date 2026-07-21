@@ -201,7 +201,13 @@ def parse_dsl_expression(
                     condition = cond_val
 
         try:
-            step = ChainStep(engine=engine_name, strength=strength, condition=condition)
+            step = ChainStep(
+                engine=engine_name,
+                strength=strength,
+                condition=condition,
+                description=None,
+                config={},
+            )
         except ValueError as e:
             raise DSLSyntaxError(f"Invalid step configuration in step {idx}: {e}") from e
 
