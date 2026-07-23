@@ -711,3 +711,18 @@ export interface ExperimentExportResponse {
 export function exportExperiment(runId: string, format: "csv" | "json" = "csv"): Promise<ExperimentExportResponse> {
   return apiFetch<ExperimentExportResponse>(`/api/v1/experiments/${runId}/export?format=${format}`);
 }
+
+export interface ExperimentUpdateResponse {
+  success: boolean;
+  id: string;
+  name: string;
+}
+
+export function updateExperiment(runId: string, updates: { name: string }): Promise<ExperimentUpdateResponse> {
+  return apiFetch<ExperimentUpdateResponse>(`/api/v1/experiments/${runId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updates),
+  });
+}
+
