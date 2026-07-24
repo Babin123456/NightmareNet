@@ -2,9 +2,10 @@ import { NextResponse } from "next/server";
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const { name } = body;
 
@@ -16,8 +17,7 @@ export async function PATCH(
       return NextResponse.json({ error: "Name too long" }, { status: 400 });
     }
 
-    // In a real app, this would hit the DB. For now, we mock success.
-    return NextResponse.json({ success: true, id: params.id, name: name.trim() });
+    return NextResponse.json({ success: true, id, name: name.trim() });
   } catch (error) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }

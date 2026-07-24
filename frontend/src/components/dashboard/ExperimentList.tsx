@@ -19,7 +19,8 @@ import { Select } from "@/components/ui/Select";
 import { SkeletonRows } from "@/components/ui/Skeleton";
 import { useToast } from "@/components/ui/Toast";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import { searchExperiments, deleteExperiment, exportExperiment, createPipeline, type PipelineCreateRequest } from "@/lib/api";
+import { InlineEdit } from "@/components/InlineEdit";
+import { searchExperiments, deleteExperiment, updateExperiment, exportExperiment, createPipeline, type PipelineCreateRequest } from "@/lib/api";
 import {
   IconBeaker,
   IconDownload,
